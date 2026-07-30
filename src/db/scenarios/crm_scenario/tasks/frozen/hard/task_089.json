@@ -1,25 +1,38 @@
 {
-  "query": "Ugh, the new lead from Alice Khan again. Just mark it as qualified, then set its score to 74, then correct its source to referral so we can move on. lead_id please.",
+  "query": "Following up from this morning's pipeline review: the contact Alice Khan at Umbrella came up again. log a note saying 'check budget' for them, then log a call about 'contract' with them, then update their phone number to +1-555-9938. Include the contact_id in your reply.",
   "answer_keys": [
-    "lead_id"
+    "contact_id"
   ],
   "ground_truth": {
-    "lead_id": 26
+    "contact_id": 60
   },
-  "expected_added": {},
-  "expected_changed": {
-    "leads": [
+  "expected_added": {
+    "activities": [
       {
-        "id": 26,
+        "contact_id": 60,
+        "type": "note",
+        "subject": "check budget"
+      },
+      {
+        "contact_id": 60,
+        "type": "call",
+        "subject": "contract"
+      }
+    ]
+  },
+  "expected_changed": {
+    "contacts": [
+      {
+        "id": 60,
         "fields": {
-          "status": "qualified",
-          "score": 74,
-          "source": "referral"
+          "phone": "+1-555-9938"
         }
       }
     ]
   },
-  "exact_added_count": {},
+  "exact_added_count": {
+    "activities": 2
+  },
   "forbidden": {
     "reps": [
       "added",
@@ -28,11 +41,11 @@
     ],
     "contacts": [
       "added",
-      "changed",
       "removed"
     ],
     "leads": [
       "added",
+      "changed",
       "removed"
     ],
     "deals": [
@@ -41,7 +54,6 @@
       "removed"
     ],
     "activities": [
-      "added",
       "changed",
       "removed"
     ],
@@ -56,6 +68,6 @@
   "task_id": "task_089",
   "world_seed": 1089,
   "difficulty": "hard",
-  "template": "act_on_a_lead",
+  "template": "act_on_a_contact",
   "pattern": "single_record_act"
 }

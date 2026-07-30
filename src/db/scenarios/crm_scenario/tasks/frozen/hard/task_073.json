@@ -1,25 +1,38 @@
 {
-  "query": "Ugh, the new lead from Rosa Silva again. Just correct its source to event, then set its score to 86, then mark it as qualified so we can move on. lead_id please.",
+  "query": "Ugh, the contact Rosa Silva at Umbrella again. Just log a meeting about 'kickoff' with them, then log a note saying 'send recap' for them, then update their phone number to +1-555-5366 so we can move on. contact_id please.",
   "answer_keys": [
-    "lead_id"
+    "contact_id"
   ],
   "ground_truth": {
-    "lead_id": 17
+    "contact_id": 57
   },
-  "expected_added": {},
-  "expected_changed": {
-    "leads": [
+  "expected_added": {
+    "activities": [
       {
-        "id": 17,
+        "contact_id": 57,
+        "type": "meeting",
+        "subject": "kickoff"
+      },
+      {
+        "contact_id": 57,
+        "type": "note",
+        "subject": "send recap"
+      }
+    ]
+  },
+  "expected_changed": {
+    "contacts": [
+      {
+        "id": 57,
         "fields": {
-          "source": "event",
-          "score": 86,
-          "status": "qualified"
+          "phone": "+1-555-5366"
         }
       }
     ]
   },
-  "exact_added_count": {},
+  "exact_added_count": {
+    "activities": 2
+  },
   "forbidden": {
     "reps": [
       "added",
@@ -28,11 +41,11 @@
     ],
     "contacts": [
       "added",
-      "changed",
       "removed"
     ],
     "leads": [
       "added",
+      "changed",
       "removed"
     ],
     "deals": [
@@ -41,7 +54,6 @@
       "removed"
     ],
     "activities": [
-      "added",
       "changed",
       "removed"
     ],
@@ -56,6 +68,6 @@
   "task_id": "task_073",
   "world_seed": 1073,
   "difficulty": "hard",
-  "template": "act_on_a_lead",
+  "template": "act_on_a_contact",
   "pattern": "single_record_act"
 }

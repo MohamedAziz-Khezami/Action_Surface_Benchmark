@@ -22,7 +22,7 @@ def code(text: str) -> None:
 
 
 md("""\
-# Ent-Agent-Bench — Results Analysis
+# action-surface-bench — Results Analysis
 
 Analyzes every model's benchmark results under `results/<model>/<model>.csv` \
 — first model by model, then aggregated across the whole fleet. The \

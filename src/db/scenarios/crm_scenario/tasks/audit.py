@@ -187,8 +187,94 @@ def check_closed_sets(task: dict, world: Path, tmp: Path) -> str | None:
                               "WHERE r.name=? AND d.stage NOT IN ('won','lost')", rep)
             if n != gt["n_deals"]:
                 return f"rep owns {n} open deals, ground truth says {gt['n_deals']}"
+        elif t == "log_note_on_each_open_deal":
+            rep = task["query"].replace("\n", " ").split("owned by ")[1].split(".")[0].strip()
+            if _count(conn, "SELECT COUNT(*) FROM reps WHERE name=?", rep) != 1:
+                return f"iterative rep name {rep!r} is not unique"
+            n = _count(conn, "SELECT COUNT(*) FROM deals d JOIN reps r ON d.rep_id=r.id "
+                              "WHERE r.name=? AND d.stage NOT IN ('won','lost')", rep)
+            if n != gt["n_logged"]:
+                return f"rep owns {n} open deals, ground truth says {gt['n_logged']}"
+        elif t == "sum_deals_in_stages":
+            rep = task["query"].replace("\n", " ").split("Sum the value of ")[1].split("'s deals")[0]
+            if _count(conn, "SELECT COUNT(*) FROM reps WHERE name=?", rep) != 1:
+                return f"lookup rep name {rep!r} is not unique"
+            total = conn.execute(
+                "SELECT COALESCE(SUM(d.value),0) FROM deals d JOIN reps r ON d.rep_id=r.id "
+                "WHERE r.name=? AND d.stage IN ('proposal','negotiation')", (rep,)).fetchone()[0]
+            if total != gt["total_value"]:
+                return f"in-stage deals sum to {total}, ground truth says {gt['total_value']}"
+        elif t == "followups_due_within_window":
+            q = task["query"].replace("\n", " ")
+            rep = q.split("How many of ")[1].split("'s follow")[0]
+            cutoff = q.split("on or before ")[1].split("?")[0]
+            if _count(conn, "SELECT COUNT(*) FROM reps WHERE name=?", rep) != 1:
+                return f"lookup rep name {rep!r} is not unique"
+            n = _count(conn, "SELECT COUNT(*) FROM followups f JOIN deals d ON f.deal_id=d.id "
+                              "JOIN reps r ON d.rep_id=r.id WHERE r.name=? AND f.due_date<=?",
+                       rep, cutoff)
+            if n != gt["n_due"]:
+                return f"rep has {n} follow-ups due on/before {cutoff}, ground truth says {gt['n_due']}"
+            # boundary safety: no follow-up within a day of the cutoff
+            from datetime import date
+            cd = date.fromisoformat(cutoff)
+            dues = conn.execute(
+                "SELECT f.due_date FROM followups f JOIN deals d ON f.deal_id=d.id "
+                "JOIN reps r ON d.rep_id=r.id WHERE r.name=?", (rep,)).fetchall()
+            if any(abs((date.fromisoformat(x["due_date"]) - cd).days) < 2 for x in dues):
+                return f"a follow-up is within 1 day of the cutoff {cutoff} (ambiguous)"
+        elif t == "reassign_contacts":
+            # "...owned by {from} to {to}. Report..." — both rep names must be
+            # unique (so "owned by X" and "to Y" each resolve to one rep), and
+            # the source's contact count is the group that must move.
+            from_rep = task["query"].split("owned by ")[1].split(" to ")[0]
+            to_rep = task["query"].split(" to ")[1].split(".")[0]
+            for name, role in ((from_rep, "source"), (to_rep, "target")):
+                if _count(conn, "SELECT COUNT(*) FROM reps WHERE name=?", name) != 1:
+                    return f"{role} rep name {name!r} is not unique"
+            n = _count(conn, "SELECT COUNT(*) FROM contacts c JOIN reps r ON c.rep_id=r.id "
+                              "WHERE r.name=?", from_rep)
+            if n != gt["n_moved"]:
+                return f"source rep owns {n} contacts, ground truth says {gt['n_moved']}"
     finally:
         conn.close()
+    return None
+
+
+# Which (table, column) writes the tool API actually offers, derived from the
+# tool arg models so it can never drift from the real tools. The tool->table
+# mapping is domain knowledge (a tool name does not name its table), kept here
+# as the one explicit fact; the writable COLUMNS come straight from each model.
+def _writable_fields() -> dict[str, set[str]]:
+    from src.tool_server import models as M
+    updaters = {"contacts": M.UpdateContactArgs, "leads": M.UpdateLeadArgs,
+                "deals": M.UpdateDealArgs, "followups": M.UpdateFollowupArgs}
+    return {table: set(model.model_fields) - {"id"} for table, model in updaters.items()}
+
+
+# Tables a create/log/schedule tool can add rows to.
+_CREATABLE_TABLES = {"contacts", "leads", "deals", "activities", "followups"}
+
+
+def check_tool_solvable(task: dict, world: Path, tmp: Path) -> str | None:
+    """Every write the task requires must be one the tool API can actually make.
+
+    The golden-solution check applies expected state via direct SQL, so it
+    confirms the goal is a valid DATABASE state — but not that an agent, which
+    has only the tools, can reach it. A task that must change a column no tool
+    exposes (e.g. a deal's rep_id, which update_deal does not offer) would pass
+    golden verification yet be impossible to complete. This closes that gap."""
+    writable = _writable_fields()
+    for table, specs in task["expected_changed"].items():
+        offered = writable.get(table, set())
+        for spec in specs:
+            for field in spec["fields"]:
+                if field not in offered:
+                    return (f"unsolvable: task must change {table}.{field}, but no "
+                            f"tool can write it (writable {table} fields: {sorted(offered)})")
+    for table in task["expected_added"]:
+        if table not in _CREATABLE_TABLES:
+            return f"unsolvable: task must add a row to {table}, but no tool creates one"
     return None
 
 
@@ -263,8 +349,9 @@ def check_rebuild_drift(task: dict, world: Path, tmp: Path) -> str | None:
     return None
 
 
-PER_TASK_CHECKS = [check_golden_solution, check_no_op_changes, check_anchor_unique,
-                    check_closed_sets, check_conditional_margin, check_rebuild_drift]
+PER_TASK_CHECKS = [check_golden_solution, check_tool_solvable, check_no_op_changes,
+                    check_anchor_unique, check_closed_sets, check_conditional_margin,
+                    check_rebuild_drift]
 
 
 def run(selector: str = "all") -> list[str]:

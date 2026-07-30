@@ -65,7 +65,7 @@ async def list_reps():
 
 @app.post("/find_contacts", operation_id="find_contacts")
 async def find_contacts(args: FindContactsArgs):
-    """Search contacts by name, email, company, or rep."""
+    """Search contacts by name, email, company, or rep. All arguments are optional — omit any you don't need."""
     return services.find_contacts(_conn, args)
 
 
@@ -77,7 +77,7 @@ async def get_contact(args: GetByIdArgs):
 
 @app.post("/find_leads", operation_id="find_leads")
 async def find_leads(args: FindLeadsArgs):
-    """Search leads by contact, rep, status, or minimum score."""
+    """Search leads by contact, rep, status, or minimum score. All arguments are optional — omit any you don't need."""
     return services.find_leads(_conn, args)
 
 
@@ -95,19 +95,19 @@ async def get_deal(args: GetByIdArgs):
 
 @app.post("/find_deals", operation_id="find_deals")
 async def find_deals(args: FindDealsArgs):
-    """Search deals by lead, stage, rep, or minimum value."""
+    """Search deals by lead, stage, rep, or minimum value. All arguments are optional — omit any you don't need."""
     return services.find_deals(_conn, args)
 
 
 @app.post("/get_activities", operation_id="get_activities")
 async def get_activities(args: GetActivitiesArgs):
-    """List activities for a deal or a contact (one of the two is required)."""
+    """List activities for a deal or a contact. One of deal_id/contact_id is required (not both need to be set, but at least one must be)."""
     return services.get_activities(_conn, args)
 
 
 @app.post("/get_followups", operation_id="get_followups")
 async def get_followups(args: GetFollowupsArgs):
-    """Search follow-ups by deal, rep, or status."""
+    """Search follow-ups by deal, rep, or status. All arguments are optional — omit any you don't need."""
     return services.get_followups(_conn, args)
 
 
@@ -119,7 +119,7 @@ async def create_contact(args: CreateContactArgs):
 
 @app.post("/update_contact", operation_id="update_contact")
 async def update_contact(args: UpdateContactArgs):
-    """Update one or more fields on an existing contact."""
+    """Update one or more fields on an existing contact. Only the fields you pass are changed."""
     return services.update_contact(_conn, args)
 
 
@@ -131,7 +131,7 @@ async def create_lead(args: CreateLeadArgs):
 
 @app.post("/update_lead", operation_id="update_lead")
 async def update_lead(args: UpdateLeadArgs):
-    """Update a lead's status, score, and/or source."""
+    """Update a lead's status, score, and/or source. Only the fields you pass are changed."""
     return services.update_lead(_conn, args)
 
 
@@ -143,13 +143,13 @@ async def create_deal(args: CreateDealArgs):
 
 @app.post("/update_deal", operation_id="update_deal")
 async def update_deal(args: UpdateDealArgs):
-    """Update a deal's stage, value, and/or close date."""
+    """Update a deal's stage, value, and/or close date. Only the fields you pass are changed."""
     return services.update_deal(_conn, args)
 
 
 @app.post("/log_activity", operation_id="log_activity")
 async def log_activity(args: LogActivityArgs):
-    """Log a call, email, meeting, or note on a deal or contact. If only deal_id is given, contact_id is filled in automatically from the deal's contact."""
+    """Log a call, email, meeting, or note on a deal or contact. At least one of deal_id/contact_id should be set; if you pass only deal_id, contact_id is filled in automatically from the deal's contact."""
     return services.log_activity(_conn, args)
 
 

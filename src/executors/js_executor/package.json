@@ -1,5 +1,5 @@
 {
-  "name": "ent-agent-bench-js-executor",
+  "name": "action-surface-bench-js-executor",
   "private": true,
   "description": "JS code-mode execution container for the benchmark harness.",
   "dependencies": {

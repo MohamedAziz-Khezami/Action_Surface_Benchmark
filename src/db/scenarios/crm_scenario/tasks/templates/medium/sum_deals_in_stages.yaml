@@ -1,0 +1,61 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: sum_deals_in_stages   (medium tier — read-only)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "Sum the value of Grace Silva's deals that are in the proposal or
+#    negotiation stage. Report the total as total_value."
+#
+# WHAT IT TESTS:
+#   A filtered aggregate whose filter the tool API cannot express in one
+#   call: find_deals takes a SINGLE stage, so the model must either query
+#   twice (once per stage) or fetch the rep's deals and filter itself, then
+#   sum the values. Deals in other stages must be excluded.
+#
+# HOW IT'S MADE VALID:
+#   The two in-scope values are DECIDED first and the total is their sum.
+#   Exactly one proposal deal and one negotiation deal carry those values;
+#   the clutter deals sit in other stages, so they can never be wrongly
+#   summed. Background deals never belong to the reserved rep.
+# ──────────────────────────────────────────────────────────────────────
+name: sum_deals_in_stages
+pattern: parallel_independent
+answer_keys: [total_value]
+n_functions: 2      # find the rep's deals (one or two calls) + sum
+n_actions: 0
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  value_proposal: {value_between: [5000, 80000]}
+  value_negotiation: {value_between: [5000, 80000]}
+  total_value: {expr: "value_proposal + value_negotiation"}
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  # the two in-scope deals
+  - {ref: lead_p, table: leads, row: {contact_id: "@the_contact"}}
+  - {ref: deal_p, table: deals,
+     row: {lead_id: "@lead_p", rep_id: "@the_rep", stage: proposal, value: "{value_proposal}"}}
+  - {ref: lead_n, table: leads, row: {contact_id: "@the_contact"}}
+  - {ref: deal_n, table: deals,
+     row: {lead_id: "@lead_n", rep_id: "@the_rep", stage: negotiation, value: "{value_negotiation}"}}
+  # clutter: deals in OTHER stages — never in scope for "proposal or negotiation"
+  - {ref: clutter_leads, table: leads, repeat: 2, row: {contact_id: "@the_contact"}}
+  - {ref: clutter_deals, table: deals, repeat: 2,
+     row: {lead_id: "@clutter_leads", rep_id: "@the_rep",
+           stage: {choice: [prospecting, qualification, closing, won, lost]}}}
+
+# ── 3. what a correct solution must have changed: NOTHING (read-only) ──
+effects: {}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {total_value: "{total_value}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  Sum the value of {rep_name}'s deals that are in the proposal or negotiation
+  stage. Report the total as total_value.

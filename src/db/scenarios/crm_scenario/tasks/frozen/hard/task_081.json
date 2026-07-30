@@ -1,40 +1,25 @@
 {
-  "query": "Following up from this morning's pipeline review: the prospecting deal with Initech came up again. log a email about 'pricing' on it, then move it to the negotiation stage, then schedule a follow-up for 2026-06-08 with the note 'confirm terms'. Include the deal_id in your reply.",
+  "query": "Ugh, the new lead from Tara Nakamura again. Just mark it as unqualified, then correct its source to referral, then set its score to 90 so we can move on. lead_id please.",
   "answer_keys": [
-    "deal_id"
+    "lead_id"
   ],
   "ground_truth": {
-    "deal_id": 7
+    "lead_id": 41
   },
-  "expected_added": {
-    "activities": [
-      {
-        "deal_id": 7,
-        "type": "email",
-        "subject": "pricing"
-      }
-    ],
-    "followups": [
-      {
-        "deal_id": 7,
-        "due_date": "2026-06-08"
-      }
-    ]
-  },
+  "expected_added": {},
   "expected_changed": {
-    "deals": [
+    "leads": [
       {
-        "id": 7,
+        "id": 41,
         "fields": {
-          "stage": "negotiation"
+          "status": "unqualified",
+          "source": "referral",
+          "score": 90
         }
       }
     ]
   },
-  "exact_added_count": {
-    "activities": 1,
-    "followups": 1
-  },
+  "exact_added_count": {},
   "forbidden": {
     "reps": [
       "added",
@@ -48,18 +33,20 @@
     ],
     "leads": [
       "added",
-      "changed",
       "removed"
     ],
     "deals": [
       "added",
+      "changed",
       "removed"
     ],
     "activities": [
+      "added",
       "changed",
       "removed"
     ],
     "followups": [
+      "added",
       "changed",
       "removed"
     ]
@@ -69,6 +56,6 @@
   "task_id": "task_081",
   "world_seed": 1081,
   "difficulty": "hard",
-  "template": "act_on_a_deal",
+  "template": "act_on_a_lead",
   "pattern": "single_record_act"
 }

@@ -1,24 +1,36 @@
 {
-  "query": "Move every prospecting-stage deal owned by Tara Tan to the qualification stage. Tell me how many you updated as n_updated.",
+  "query": "Reassign every contact owned by Tara Tan to Dana Silva. Report how many you moved as n_moved.",
   "answer_keys": [
-    "n_updated"
+    "n_moved"
   ],
   "ground_truth": {
-    "n_updated": 2
+    "n_moved": 4
   },
   "expected_added": {},
   "expected_changed": {
-    "deals": [
+    "contacts": [
       {
-        "id": 7,
+        "id": 30,
         "fields": {
-          "stage": "qualification"
+          "rep_id": 1
         }
       },
       {
-        "id": 26,
+        "id": 38,
         "fields": {
-          "stage": "qualification"
+          "rep_id": 1
+        }
+      },
+      {
+        "id": 18,
+        "fields": {
+          "rep_id": 1
+        }
+      },
+      {
+        "id": 39,
+        "fields": {
+          "rep_id": 1
         }
       }
     ]
@@ -32,7 +44,6 @@
     ],
     "contacts": [
       "added",
-      "changed",
       "removed"
     ],
     "leads": [
@@ -42,6 +53,7 @@
     ],
     "deals": [
       "added",
+      "changed",
       "removed"
     ],
     "activities": [
@@ -55,11 +67,11 @@
       "removed"
     ]
   },
-  "n_functions": 3,
-  "n_actions": 2,
+  "n_functions": 6,
+  "n_actions": 4,
   "task_id": "task_113",
   "world_seed": 1113,
   "difficulty": "expert",
-  "template": "update_every_matching_deal",
+  "template": "reassign_contacts",
   "pattern": "iterate_over_set"
 }

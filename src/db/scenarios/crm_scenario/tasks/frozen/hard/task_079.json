@@ -1,37 +1,39 @@
 {
-  "query": "Following up from this morning's pipeline review: the contact Dana Ruiz at Stark came up again. update their phone number to +1-555-5546, then log a note saying 'send recap' for them, then log a email about 'kickoff' with them. Include the contact_id in your reply.",
+  "query": "Ugh, the prospecting deal with Stark again. Just log a call about 'kickoff' on it, then schedule a follow-up for 2026-06-11 with the note 'send recap', then move it to the closing stage so we can move on. deal_id please.",
   "answer_keys": [
-    "contact_id"
+    "deal_id"
   ],
   "ground_truth": {
-    "contact_id": 36
+    "deal_id": 6
   },
   "expected_added": {
     "activities": [
       {
-        "contact_id": 36,
-        "type": "note",
-        "subject": "send recap"
-      },
-      {
-        "contact_id": 36,
-        "type": "email",
+        "deal_id": 6,
+        "type": "call",
         "subject": "kickoff"
+      }
+    ],
+    "followups": [
+      {
+        "deal_id": 6,
+        "due_date": "2026-06-11"
       }
     ]
   },
   "expected_changed": {
-    "contacts": [
+    "deals": [
       {
-        "id": 36,
+        "id": 6,
         "fields": {
-          "phone": "+1-555-5546"
+          "stage": "closing"
         }
       }
     ]
   },
   "exact_added_count": {
-    "activities": 2
+    "activities": 1,
+    "followups": 1
   },
   "forbidden": {
     "reps": [
@@ -41,6 +43,7 @@
     ],
     "contacts": [
       "added",
+      "changed",
       "removed"
     ],
     "leads": [
@@ -50,7 +53,6 @@
     ],
     "deals": [
       "added",
-      "changed",
       "removed"
     ],
     "activities": [
@@ -58,7 +60,6 @@
       "removed"
     ],
     "followups": [
-      "added",
       "changed",
       "removed"
     ]
@@ -68,6 +69,6 @@
   "task_id": "task_079",
   "world_seed": 1079,
   "difficulty": "hard",
-  "template": "act_on_a_contact",
+  "template": "act_on_a_deal",
   "pattern": "single_record_act"
 }

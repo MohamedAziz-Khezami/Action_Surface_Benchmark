@@ -1,37 +1,39 @@
 {
-  "query": "We're behind on the contact Alice Ruiz at Cyberdyne and the quarter is closing \u2014 log a note saying 'send recap' for them, then log a email about 'pricing' with them, then update their phone number to +1-555-5988, and don't touch anything else. Send me the contact_id when done.",
+  "query": "Following up from this morning's pipeline review: the prospecting deal with Cyberdyne came up again. schedule a follow-up for 2026-06-04 with the note 'check budget', then move it to the closing stage, then log a call about 'renewal' on it. Include the deal_id in your reply.",
   "answer_keys": [
-    "contact_id"
+    "deal_id"
   ],
   "ground_truth": {
-    "contact_id": 40
+    "deal_id": 19
   },
   "expected_added": {
+    "followups": [
+      {
+        "deal_id": 19,
+        "due_date": "2026-06-04"
+      }
+    ],
     "activities": [
       {
-        "contact_id": 40,
-        "type": "note",
-        "subject": "send recap"
-      },
-      {
-        "contact_id": 40,
-        "type": "email",
-        "subject": "pricing"
+        "deal_id": 19,
+        "type": "call",
+        "subject": "renewal"
       }
     ]
   },
   "expected_changed": {
-    "contacts": [
+    "deals": [
       {
-        "id": 40,
+        "id": 19,
         "fields": {
-          "phone": "+1-555-5988"
+          "stage": "closing"
         }
       }
     ]
   },
   "exact_added_count": {
-    "activities": 2
+    "followups": 1,
+    "activities": 1
   },
   "forbidden": {
     "reps": [
@@ -41,6 +43,7 @@
     ],
     "contacts": [
       "added",
+      "changed",
       "removed"
     ],
     "leads": [
@@ -50,7 +53,6 @@
     ],
     "deals": [
       "added",
-      "changed",
       "removed"
     ],
     "activities": [
@@ -58,7 +60,6 @@
       "removed"
     ],
     "followups": [
-      "added",
       "changed",
       "removed"
     ]
@@ -68,6 +69,6 @@
   "task_id": "task_080",
   "world_seed": 1080,
   "difficulty": "hard",
-  "template": "act_on_a_contact",
+  "template": "act_on_a_deal",
   "pattern": "single_record_act"
 }

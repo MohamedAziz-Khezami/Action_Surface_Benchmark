@@ -1,38 +1,25 @@
 {
-  "query": "We're behind on the contact Priya Silva at Initech and the quarter is closing \u2014 log a note saying 'send recap' for them, then log a call about 'renewal' with them, then update their phone number to +1-555-8572, and don't touch anything else. Send me the contact_id when done.",
+  "query": "We're behind on the new lead from Priya Silva and the quarter is closing \u2014 mark it as unqualified, then set its score to 87, then correct its source to referral, and don't touch anything else. Send me the lead_id when done.",
   "answer_keys": [
-    "contact_id"
+    "lead_id"
   ],
   "ground_truth": {
-    "contact_id": 7
+    "lead_id": 1
   },
-  "expected_added": {
-    "activities": [
-      {
-        "contact_id": 7,
-        "type": "note",
-        "subject": "send recap"
-      },
-      {
-        "contact_id": 7,
-        "type": "call",
-        "subject": "renewal"
-      }
-    ]
-  },
+  "expected_added": {},
   "expected_changed": {
-    "contacts": [
+    "leads": [
       {
-        "id": 7,
+        "id": 1,
         "fields": {
-          "phone": "+1-555-8572"
+          "status": "unqualified",
+          "score": 87,
+          "source": "referral"
         }
       }
     ]
   },
-  "exact_added_count": {
-    "activities": 2
-  },
+  "exact_added_count": {},
   "forbidden": {
     "reps": [
       "added",
@@ -41,11 +28,11 @@
     ],
     "contacts": [
       "added",
+      "changed",
       "removed"
     ],
     "leads": [
       "added",
-      "changed",
       "removed"
     ],
     "deals": [
@@ -54,6 +41,7 @@
       "removed"
     ],
     "activities": [
+      "added",
       "changed",
       "removed"
     ],
@@ -68,6 +56,6 @@
   "task_id": "task_075",
   "world_seed": 1075,
   "difficulty": "hard",
-  "template": "act_on_a_contact",
+  "template": "act_on_a_lead",
   "pattern": "single_record_act"
 }

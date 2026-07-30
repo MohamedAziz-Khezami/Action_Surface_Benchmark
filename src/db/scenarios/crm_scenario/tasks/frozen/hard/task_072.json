@@ -1,25 +1,29 @@
 {
-  "query": "Ugh, the new lead from Dana Nakamura again. Just correct its source to referral, then mark it as qualified, then set its score to 69 so we can move on. lead_id please.",
+  "query": "Log a note with the subject 'touch base' on every open deal owned by Dana Nakamura. Report how many you logged as n_logged.",
   "answer_keys": [
-    "lead_id"
+    "n_logged"
   ],
   "ground_truth": {
-    "lead_id": 9
+    "n_logged": 2
   },
-  "expected_added": {},
-  "expected_changed": {
-    "leads": [
+  "expected_added": {
+    "activities": [
       {
-        "id": 9,
-        "fields": {
-          "source": "referral",
-          "status": "qualified",
-          "score": 69
-        }
+        "deal_id": 27,
+        "type": "note",
+        "subject": "touch base"
+      },
+      {
+        "deal_id": 16,
+        "type": "note",
+        "subject": "touch base"
       }
     ]
   },
-  "exact_added_count": {},
+  "expected_changed": {},
+  "exact_added_count": {
+    "activities": 2
+  },
   "forbidden": {
     "reps": [
       "added",
@@ -33,6 +37,7 @@
     ],
     "leads": [
       "added",
+      "changed",
       "removed"
     ],
     "deals": [
@@ -41,7 +46,6 @@
       "removed"
     ],
     "activities": [
-      "added",
       "changed",
       "removed"
     ],
@@ -51,11 +55,11 @@
       "removed"
     ]
   },
-  "n_functions": 4,
-  "n_actions": 3,
+  "n_functions": 3,
+  "n_actions": 2,
   "task_id": "task_072",
   "world_seed": 1072,
   "difficulty": "hard",
-  "template": "act_on_a_lead",
-  "pattern": "single_record_act"
+  "template": "log_note_on_each_open_deal",
+  "pattern": "iterate_over_set"
 }

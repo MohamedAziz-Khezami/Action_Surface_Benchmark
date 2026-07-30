@@ -1,25 +1,39 @@
 {
-  "query": "We're behind on the new lead from Elif Silva and the quarter is closing \u2014 set its score to 63, then mark it as qualified, then correct its source to inbound_email, and don't touch anything else. Send me the lead_id when done.",
+  "query": "Log a note with the subject 'quarterly review' on every open deal owned by Elif Silva. Report how many you logged as n_logged.",
   "answer_keys": [
-    "lead_id"
+    "n_logged"
   ],
   "ground_truth": {
-    "lead_id": 12
+    "n_logged": 4
   },
-  "expected_added": {},
-  "expected_changed": {
-    "leads": [
+  "expected_added": {
+    "activities": [
       {
-        "id": 12,
-        "fields": {
-          "score": 63,
-          "status": "qualified",
-          "source": "inbound_email"
-        }
+        "deal_id": 6,
+        "type": "note",
+        "subject": "quarterly review"
+      },
+      {
+        "deal_id": 15,
+        "type": "note",
+        "subject": "quarterly review"
+      },
+      {
+        "deal_id": 32,
+        "type": "note",
+        "subject": "quarterly review"
+      },
+      {
+        "deal_id": 33,
+        "type": "note",
+        "subject": "quarterly review"
       }
     ]
   },
-  "exact_added_count": {},
+  "expected_changed": {},
+  "exact_added_count": {
+    "activities": 4
+  },
   "forbidden": {
     "reps": [
       "added",
@@ -33,6 +47,7 @@
     ],
     "leads": [
       "added",
+      "changed",
       "removed"
     ],
     "deals": [
@@ -41,7 +56,6 @@
       "removed"
     ],
     "activities": [
-      "added",
       "changed",
       "removed"
     ],
@@ -51,11 +65,11 @@
       "removed"
     ]
   },
-  "n_functions": 4,
-  "n_actions": 3,
+  "n_functions": 5,
+  "n_actions": 4,
   "task_id": "task_069",
   "world_seed": 1069,
   "difficulty": "hard",
-  "template": "act_on_a_lead",
-  "pattern": "single_record_act"
+  "template": "log_note_on_each_open_deal",
+  "pattern": "iterate_over_set"
 }

@@ -1,40 +1,25 @@
 {
-  "query": "Following up from this morning's pipeline review: the prospecting deal with Tyrell came up again. schedule a follow-up for 2026-06-06 with the note 'confirm terms', then log a meeting about 'pricing' on it, then move it to the closing stage. Include the deal_id in your reply.",
+  "query": "We're behind on the new lead from Iris Mo and the quarter is closing \u2014 mark it as unqualified, then set its score to 94, then correct its source to inbound_email, and don't touch anything else. Send me the lead_id when done.",
   "answer_keys": [
-    "deal_id"
+    "lead_id"
   ],
   "ground_truth": {
-    "deal_id": 35
+    "lead_id": 23
   },
-  "expected_added": {
-    "followups": [
-      {
-        "deal_id": 35,
-        "due_date": "2026-06-06"
-      }
-    ],
-    "activities": [
-      {
-        "deal_id": 35,
-        "type": "meeting",
-        "subject": "pricing"
-      }
-    ]
-  },
+  "expected_added": {},
   "expected_changed": {
-    "deals": [
+    "leads": [
       {
-        "id": 35,
+        "id": 23,
         "fields": {
-          "stage": "closing"
+          "status": "unqualified",
+          "score": 94,
+          "source": "inbound_email"
         }
       }
     ]
   },
-  "exact_added_count": {
-    "followups": 1,
-    "activities": 1
-  },
+  "exact_added_count": {},
   "forbidden": {
     "reps": [
       "added",
@@ -48,18 +33,20 @@
     ],
     "leads": [
       "added",
-      "changed",
       "removed"
     ],
     "deals": [
       "added",
+      "changed",
       "removed"
     ],
     "activities": [
+      "added",
       "changed",
       "removed"
     ],
     "followups": [
+      "added",
       "changed",
       "removed"
     ]
@@ -69,6 +56,6 @@
   "task_id": "task_066",
   "world_seed": 1066,
   "difficulty": "hard",
-  "template": "act_on_a_deal",
+  "template": "act_on_a_lead",
   "pattern": "single_record_act"
 }

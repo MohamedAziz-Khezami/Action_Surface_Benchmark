@@ -1,40 +1,25 @@
 {
-  "query": "We're behind on the prospecting deal with Wayne and the quarter is closing \u2014 move it to the closing stage, then log a call about 'kickoff' on it, then schedule a follow-up for 2026-06-04 with the note 'send recap', and don't touch anything else. Send me the deal_id when done.",
+  "query": "We're behind on the new lead from Noor Moreau and the quarter is closing \u2014 mark it as qualified, then correct its source to event, then set its score to 85, and don't touch anything else. Send me the lead_id when done.",
   "answer_keys": [
-    "deal_id"
+    "lead_id"
   ],
   "ground_truth": {
-    "deal_id": 27
+    "lead_id": 15
   },
-  "expected_added": {
-    "activities": [
-      {
-        "deal_id": 27,
-        "type": "call",
-        "subject": "kickoff"
-      }
-    ],
-    "followups": [
-      {
-        "deal_id": 27,
-        "due_date": "2026-06-04"
-      }
-    ]
-  },
+  "expected_added": {},
   "expected_changed": {
-    "deals": [
+    "leads": [
       {
-        "id": 27,
+        "id": 15,
         "fields": {
-          "stage": "closing"
+          "status": "qualified",
+          "source": "event",
+          "score": 85
         }
       }
     ]
   },
-  "exact_added_count": {
-    "activities": 1,
-    "followups": 1
-  },
+  "exact_added_count": {},
   "forbidden": {
     "reps": [
       "added",
@@ -48,18 +33,20 @@
     ],
     "leads": [
       "added",
-      "changed",
       "removed"
     ],
     "deals": [
       "added",
+      "changed",
       "removed"
     ],
     "activities": [
+      "added",
       "changed",
       "removed"
     ],
     "followups": [
+      "added",
       "changed",
       "removed"
     ]
@@ -69,6 +56,6 @@
   "task_id": "task_086",
   "world_seed": 1086,
   "difficulty": "hard",
-  "template": "act_on_a_deal",
+  "template": "act_on_a_lead",
   "pattern": "single_record_act"
 }

@@ -1,37 +1,33 @@
 {
-  "query": "Ugh, the contact Jonas Iversen at Tyrell again. Just update their phone number to +1-555-8469, then log a note saying 'check budget' for them, then log a meeting about 'contract' with them so we can move on. contact_id please.",
+  "query": "Log a note with the subject 'status update' on every open deal owned by Jonas Iversen. Report how many you logged as n_logged.",
   "answer_keys": [
-    "contact_id"
+    "n_logged"
   ],
   "ground_truth": {
-    "contact_id": 55
+    "n_logged": 3
   },
   "expected_added": {
     "activities": [
       {
-        "contact_id": 55,
+        "deal_id": 27,
         "type": "note",
-        "subject": "check budget"
+        "subject": "status update"
       },
       {
-        "contact_id": 55,
-        "type": "meeting",
-        "subject": "contract"
-      }
-    ]
-  },
-  "expected_changed": {
-    "contacts": [
+        "deal_id": 19,
+        "type": "note",
+        "subject": "status update"
+      },
       {
-        "id": 55,
-        "fields": {
-          "phone": "+1-555-8469"
-        }
+        "deal_id": 9,
+        "type": "note",
+        "subject": "status update"
       }
     ]
   },
+  "expected_changed": {},
   "exact_added_count": {
-    "activities": 2
+    "activities": 3
   },
   "forbidden": {
     "reps": [
@@ -41,6 +37,7 @@
     ],
     "contacts": [
       "added",
+      "changed",
       "removed"
     ],
     "leads": [
@@ -68,6 +65,6 @@
   "task_id": "task_070",
   "world_seed": 1070,
   "difficulty": "hard",
-  "template": "act_on_a_contact",
-  "pattern": "single_record_act"
+  "template": "log_note_on_each_open_deal",
+  "pattern": "iterate_over_set"
 }

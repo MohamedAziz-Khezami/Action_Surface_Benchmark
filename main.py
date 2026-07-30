@@ -11,13 +11,15 @@ from src.db.scenarios.crm_scenario.tasks.build_tasks import FROZEN_DIR, build_al
 from src.llm_clients.registry import load_model_registry
 
 CSV_FIELDS = [
-    "episode_id", "model", "surface", "interaction_mode", "task_id", "difficulty", "template", "pattern", "world_seed",
+    "episode_id", "trial", "model", "surface", "interaction_mode", "task_id", "difficulty", "template", "pattern", "world_seed",
     "passed", "answer_correct", "db_correct", "fulfillment_score",
     "n_functions_expected", "tool_calls_made", "model_turns",
     "total_latency_seconds", "model_latency_seconds", "execution_latency_seconds",
     "input_tokens", "output_tokens", "total_tokens",
+    "cost_priced", "input_cost_usd", "output_cost_usd", "token_cost_usd", "sandbox_cost_usd", "episode_cost_usd",
     "tool_error_count", "syntax_error_count", "type_error_count", "runtime_error_count", "parse_error_count",
-    "recovered", "hit_turn_budget", "infra_error", "model_api_error", "model_api_error_message",
+    "recovered", "unauthorized_write_count", "had_unauthorized_write",
+    "hit_turn_budget", "infra_error", "model_api_error", "model_api_error_message",
     "episode_error", "episode_error_message",
     "verifier_reasons",
 ]
@@ -25,6 +27,21 @@ CSV_FIELDS = [
 
 def main() -> None:
     args = parse_args()
+
+    if args.command == "gen-tools":
+        from src.tool_server.schema_gen import check_all, write_all
+        if args.check:
+            stale = check_all()
+            if stale:
+                print("[gen-tools] OUT OF DATE — regenerate with `python main.py gen-tools`:")
+                for path in stale:
+                    print(f"  {path}")
+                raise SystemExit(1)
+            print("[gen-tools] all surface documents are up to date")
+            return
+        for path in write_all():
+            print(f"[gen-tools] wrote {path}")
+        return
 
     if args.command == "generate-tasks":
         n = build_all(n_per_tier=args.n_per_tier, seed_base=args.seed_base)
@@ -72,7 +89,8 @@ def main() -> None:
             return args.interaction_modes.split(",")
         return ["tool_call"] if model_config.supports_tool_calling else ["text_block"]
 
-    total = sum(len(modes_for(m)) for m in selected_models) * len(surfaces) * len(tasks)
+    n_trials = max(1, args.n_trials)
+    total = sum(len(modes_for(m)) for m in selected_models) * len(surfaces) * len(tasks) * n_trials
     done = 0
     with out_path.open("w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS)
@@ -81,12 +99,18 @@ def main() -> None:
             for surface in surfaces:
                 for mode in modes_for(model_config):
                     for task in tasks:
-                        row = run_episode(model_config, surface, mode, task, trajectory_dir=str(trajectory_dir))
-                        writer.writerow(row)
-                        f.flush()
-                        done += 1
-                        print(f"[{done}/{total}] {model_config.name} {surface} {mode} "
-                              f"{task['task_id']} -> passed={row['passed']} turns={row['model_turns']}")
+                        # Trials of one cell run back to back. Each run_episode
+                        # gets its own fresh world copy and container, so trials
+                        # never share state; the model's own sampling supplies
+                        # the i.i.d. variation the pass^k estimate reads.
+                        for trial in range(n_trials):
+                            row = run_episode(model_config, surface, mode, task, trajectory_dir=str(trajectory_dir))
+                            row["trial"] = trial
+                            writer.writerow(row)
+                            f.flush()
+                            done += 1
+                            print(f"[{done}/{total}] {model_config.name} {surface} {mode} "
+                                  f"{task['task_id']} trial={trial} -> passed={row['passed']} turns={row['model_turns']}")
 
     print(f"\nwrote {out_path}")
 

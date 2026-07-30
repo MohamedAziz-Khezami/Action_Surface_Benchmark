@@ -33,9 +33,17 @@ def _categorize_error(error: dict) -> str:
 class EpisodeMeter:
     def __init__(self, episode_id: str, model: str, surface: str, interaction_mode: str,
                  task_id: str, difficulty: str, world_seed: int, n_functions_expected: int,
-                 template: str, pattern: str):
+                 template: str, pattern: str,
+                 price_in_per_mtok: float | None = None,
+                 price_out_per_mtok: float | None = None,
+                 sandbox_usd_per_second: float = 0.0):
         self.episode_id = episode_id
         self.model = model
+        # Prices are captured per episode so the cost is reproducible from the
+        # CSV even if models.yaml or config.py later change.
+        self.price_in_per_mtok = price_in_per_mtok
+        self.price_out_per_mtok = price_out_per_mtok
+        self.sandbox_usd_per_second = sandbox_usd_per_second
         self.surface = surface
         self.interaction_mode = interaction_mode
         self.task_id = task_id
@@ -120,11 +128,32 @@ class EpisodeMeter:
         self.model_api_error_message = message
 
     def finalize(self, verify_result: dict) -> dict:
-        """`verify_result` is verify()'s output: {passed, reasons, checks}."""
+        """`verify_result` is verify()'s output: {passed, reasons, checks,
+        unauthorized_write_count}."""
         total_latency_seconds = time.monotonic() - self._start
         total_tokens = self.input_tokens + self.output_tokens
         checks = verify_result.get("checks", {})
         fulfillment_score = (sum(checks.values()) / len(checks)) if checks else 0.0
+
+        # Blast radius: rows written that the task never authorized. Defaults to
+        # 0 on the infra/api/episode-error paths, whose synthetic verify_result
+        # has no diff behind it — those episodes never ran the model's writes.
+        unauthorized_write_count = verify_result.get("unauthorized_write_count", 0)
+
+        # Cost. Split into token cost and sandbox-compute cost so each is
+        # inspectable and the sandbox term (code-mode's hidden cost) is never
+        # buried. `cost_priced` is 0 when this model has no token price, so a
+        # blank cost is distinguishable from a genuine $0.
+        cost_priced = int(self.price_in_per_mtok is not None
+                          and self.price_out_per_mtok is not None)
+        if cost_priced:
+            input_cost_usd = self.input_tokens / 1_000_000 * self.price_in_per_mtok
+            output_cost_usd = self.output_tokens / 1_000_000 * self.price_out_per_mtok
+            token_cost_usd = input_cost_usd + output_cost_usd
+        else:
+            input_cost_usd = output_cost_usd = token_cost_usd = None
+        sandbox_cost_usd = self.execution_latency_seconds * self.sandbox_usd_per_second
+        episode_cost_usd = (token_cost_usd + sandbox_cost_usd) if cost_priced else None
 
         total_errors = (self.tool_error_count + self.syntax_error_count
                          + self.type_error_count + self.runtime_error_count
@@ -160,12 +189,20 @@ class EpisodeMeter:
             "input_tokens": self.input_tokens,
             "output_tokens": self.output_tokens,
             "total_tokens": total_tokens,
+            "cost_priced": cost_priced,
+            "input_cost_usd": input_cost_usd,
+            "output_cost_usd": output_cost_usd,
+            "token_cost_usd": token_cost_usd,
+            "sandbox_cost_usd": sandbox_cost_usd,
+            "episode_cost_usd": episode_cost_usd,
             "tool_error_count": self.tool_error_count,
             "syntax_error_count": self.syntax_error_count,
             "type_error_count": self.type_error_count,
             "runtime_error_count": self.runtime_error_count,
             "parse_error_count": self.parse_error_count,
             "recovered": recovered,
+            "unauthorized_write_count": unauthorized_write_count,
+            "had_unauthorized_write": int(unauthorized_write_count > 0),
             "hit_turn_budget": self.hit_turn_budget,
             "infra_error": self.infra_error,
             "model_api_error": self.model_api_error,

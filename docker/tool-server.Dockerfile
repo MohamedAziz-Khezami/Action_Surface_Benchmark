@@ -19,6 +19,10 @@ RUN pip install --no-cache-dir fastapi uvicorn fastapi-mcp
 COPY src/core/ src/core/
 COPY src/db/ src/db/
 COPY src/tool_server/ src/tool_server/
+# config.py lives at the repo root and is imported as a top-level module
+# (crm_db.py does `from config import SIM_TODAY`), so it has to land next to
+# src/ inside /app or the server won't import at all.
+COPY config.py .
 
 EXPOSE 8000
 

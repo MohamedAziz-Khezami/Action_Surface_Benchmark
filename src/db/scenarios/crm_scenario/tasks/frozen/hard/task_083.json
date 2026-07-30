@@ -1,25 +1,39 @@
 {
-  "query": "Ugh, the new lead from Hugo Silva again. Just mark it as unqualified, then set its score to 62, then correct its source to event so we can move on. lead_id please.",
+  "query": "Log a note with the subject 'status update' on every open deal owned by Dana Silva. Report how many you logged as n_logged.",
   "answer_keys": [
-    "lead_id"
+    "n_logged"
   ],
   "ground_truth": {
-    "lead_id": 5
+    "n_logged": 4
   },
-  "expected_added": {},
-  "expected_changed": {
-    "leads": [
+  "expected_added": {
+    "activities": [
       {
-        "id": 5,
-        "fields": {
-          "status": "unqualified",
-          "score": 62,
-          "source": "event"
-        }
+        "deal_id": 35,
+        "type": "note",
+        "subject": "status update"
+      },
+      {
+        "deal_id": 39,
+        "type": "note",
+        "subject": "status update"
+      },
+      {
+        "deal_id": 9,
+        "type": "note",
+        "subject": "status update"
+      },
+      {
+        "deal_id": 38,
+        "type": "note",
+        "subject": "status update"
       }
     ]
   },
-  "exact_added_count": {},
+  "expected_changed": {},
+  "exact_added_count": {
+    "activities": 4
+  },
   "forbidden": {
     "reps": [
       "added",
@@ -33,6 +47,7 @@
     ],
     "leads": [
       "added",
+      "changed",
       "removed"
     ],
     "deals": [
@@ -41,7 +56,6 @@
       "removed"
     ],
     "activities": [
-      "added",
       "changed",
       "removed"
     ],
@@ -51,11 +65,11 @@
       "removed"
     ]
   },
-  "n_functions": 4,
-  "n_actions": 3,
+  "n_functions": 5,
+  "n_actions": 4,
   "task_id": "task_083",
   "world_seed": 1083,
   "difficulty": "hard",
-  "template": "act_on_a_lead",
-  "pattern": "single_record_act"
+  "template": "log_note_on_each_open_deal",
+  "pattern": "iterate_over_set"
 }

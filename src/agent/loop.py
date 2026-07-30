@@ -21,7 +21,7 @@ import uuid
 import requests
 
 from config import RETRY_DELAYS_S as _TOOL_CALL_RETRY_DELAYS_S
-from config import CONTAINER_READY_TIMEOUT_S, TOOL_CALL_HTTP_TIMEOUT_S, TRAJECTORY_DIR, TURN_BUDGET
+from config import CONTAINER_READY_TIMEOUT_S, SANDBOX_USD_PER_SECOND, TOOL_CALL_HTTP_TIMEOUT_S, TRAJECTORY_DIR, TURN_BUDGET
 from src.agent import prompts
 from src.agent.final_answer import is_final_answer, parse_final_answer
 from src.agent.trajectory import Trajectory
@@ -132,7 +132,10 @@ def run_episode(model_config, surface: str, interaction_mode: str, task: dict,
         trajectory_dir = TRAJECTORY_DIR
     world_seed = task["world_seed"]
     episode_id = uuid.uuid4().hex[:8]
-    meter = EpisodeMeter(episode_id, model_config.name, surface, interaction_mode, task["task_id"], task["difficulty"], world_seed, task["n_functions"], task["template"], task["pattern"])
+    meter = EpisodeMeter(episode_id, model_config.name, surface, interaction_mode, task["task_id"], task["difficulty"], world_seed, task["n_functions"], task["template"], task["pattern"],
+                         price_in_per_mtok=model_config.price_in_per_mtok,
+                         price_out_per_mtok=model_config.price_out_per_mtok,
+                         sandbox_usd_per_second=SANDBOX_USD_PER_SECOND)
     traj = Trajectory(episode_id, model_config.name, surface, interaction_mode, task["task_id"], task["query"])
     client = make_client(model_config)
     turn_budget = TURN_BUDGET

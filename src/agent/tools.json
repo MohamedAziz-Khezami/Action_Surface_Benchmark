@@ -4,22 +4,38 @@
       "type": "function",
       "function": {
         "name": "list_reps",
-        "description": "List every sales rep.",
-        "parameters": {"type": "object", "properties": {}, "required": []}
+        "description": "List every sales rep.\n\nReturns: a list of reps, each shaped like:\n{\"id\": 3, \"name\": \"Priya Chen\", \"email\": \"priya.chen@company.example\", \"team\": \"East\", \"active\": 1}",
+        "parameters": {
+          "type": "object",
+          "properties": {},
+          "required": []
+        }
       }
     },
     {
       "type": "function",
       "function": {
         "name": "find_contacts",
-        "description": "Search contacts by name, email, company, or rep.",
+        "description": "Search contacts by name, email, company, or rep. All arguments are optional \u2014 omit any you don't need.\n\nReturns: a list of contacts, each shaped like:\n{\"id\": 7, \"name\": \"Alice Nakamura\", \"email\": \"alice.nakamura@wonka.example\", \"phone\": \"+1-555-3362\", \"company\": \"Wonka\", \"rep_id\": 6, \"created_at\": \"2026-01-14\"}",
         "parameters": {
           "type": "object",
           "properties": {
-            "name": {"type": "string"},
-            "email": {"type": "string"},
-            "company": {"type": "string"},
-            "rep_id": {"type": "integer"}
+            "name": {
+              "type": "string",
+              "description": "case-insensitive partial match on the contact's name"
+            },
+            "email": {
+              "type": "string",
+              "description": "exact match on the contact's email"
+            },
+            "company": {
+              "type": "string",
+              "description": "exact match on the contact's company"
+            },
+            "rep_id": {
+              "type": "integer",
+              "description": "only return contacts owned by this rep's id"
+            }
           },
           "required": []
         }
@@ -29,11 +45,18 @@
       "type": "function",
       "function": {
         "name": "get_contact",
-        "description": "Fetch one contact by id.",
+        "description": "Fetch one contact by id.\n\nReturns: one contact, shaped like:\n{\"id\": 7, \"name\": \"Alice Nakamura\", \"email\": \"alice.nakamura@wonka.example\", \"phone\": \"+1-555-3362\", \"company\": \"Wonka\", \"rep_id\": 6, \"created_at\": \"2026-01-14\"}",
         "parameters": {
           "type": "object",
-          "properties": {"id": {"type": "integer"}},
-          "required": ["id"]
+          "properties": {
+            "id": {
+              "type": "integer",
+              "description": "the contact's id"
+            }
+          },
+          "required": [
+            "id"
+          ]
         }
       }
     },
@@ -41,14 +64,32 @@
       "type": "function",
       "function": {
         "name": "find_leads",
-        "description": "Search leads by contact, rep, status, or minimum score.",
+        "description": "Search leads by contact, rep, status, or minimum score. All arguments are optional \u2014 omit any you don't need.\n\nReturns: a list of leads, each shaped like:\n{\"id\": 12, \"contact_id\": 7, \"source\": \"referral\", \"score\": 72, \"status\": \"qualified\", \"rep_id\": 6, \"created_at\": \"2026-01-20\"}",
         "parameters": {
           "type": "object",
           "properties": {
-            "contact_id": {"type": "integer"},
-            "rep_id": {"type": "integer"},
-            "status": {"type": "string", "enum": ["new", "qualified", "unqualified", "converted"]},
-            "min_score": {"type": "integer"}
+            "contact_id": {
+              "type": "integer",
+              "description": "only return leads for this contact's id"
+            },
+            "rep_id": {
+              "type": "integer",
+              "description": "only return leads owned by this rep's id"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "new",
+                "qualified",
+                "unqualified",
+                "converted"
+              ],
+              "description": "only return leads with this status"
+            },
+            "min_score": {
+              "type": "integer",
+              "description": "only return leads with a score at or above this value"
+            }
           },
           "required": []
         }
@@ -58,11 +99,18 @@
       "type": "function",
       "function": {
         "name": "get_lead",
-        "description": "Fetch one lead by id.",
+        "description": "Fetch one lead by id.\n\nReturns: one lead, shaped like:\n{\"id\": 12, \"contact_id\": 7, \"source\": \"referral\", \"score\": 72, \"status\": \"qualified\", \"rep_id\": 6, \"created_at\": \"2026-01-20\"}",
         "parameters": {
           "type": "object",
-          "properties": {"id": {"type": "integer"}},
-          "required": ["id"]
+          "properties": {
+            "id": {
+              "type": "integer",
+              "description": "the lead's id"
+            }
+          },
+          "required": [
+            "id"
+          ]
         }
       }
     },
@@ -70,11 +118,18 @@
       "type": "function",
       "function": {
         "name": "get_deal",
-        "description": "Fetch one deal by id.",
+        "description": "Fetch one deal by id.\n\nReturns: one deal, shaped like:\n{\"id\": 4, \"lead_id\": 12, \"name\": \"Acme rollout\", \"stage\": \"proposal\", \"value\": 45000.0, \"currency\": \"USD\", \"close_date\": \"2026-06-01\", \"rep_id\": 3, \"created_at\": \"2026-01-15\"}",
         "parameters": {
           "type": "object",
-          "properties": {"id": {"type": "integer"}},
-          "required": ["id"]
+          "properties": {
+            "id": {
+              "type": "integer",
+              "description": "the deal's id"
+            }
+          },
+          "required": [
+            "id"
+          ]
         }
       }
     },
@@ -82,14 +137,35 @@
       "type": "function",
       "function": {
         "name": "find_deals",
-        "description": "Search deals by lead, stage, rep, or minimum value.",
+        "description": "Search deals by lead, stage, rep, or minimum value. All arguments are optional \u2014 omit any you don't need.\n\nReturns: a list of deals, each shaped like:\n{\"id\": 4, \"lead_id\": 12, \"name\": \"Acme rollout\", \"stage\": \"proposal\", \"value\": 45000.0, \"currency\": \"USD\", \"close_date\": \"2026-06-01\", \"rep_id\": 3, \"created_at\": \"2026-01-15\"}",
         "parameters": {
           "type": "object",
           "properties": {
-            "lead_id": {"type": "integer"},
-            "stage": {"type": "string", "enum": ["prospecting", "qualification", "proposal", "negotiation", "closing", "won", "lost"]},
-            "rep_id": {"type": "integer"},
-            "min_value": {"type": "number"}
+            "lead_id": {
+              "type": "integer",
+              "description": "only return deals under this lead's id"
+            },
+            "stage": {
+              "type": "string",
+              "enum": [
+                "prospecting",
+                "qualification",
+                "proposal",
+                "negotiation",
+                "closing",
+                "won",
+                "lost"
+              ],
+              "description": "only return deals in this pipeline stage"
+            },
+            "rep_id": {
+              "type": "integer",
+              "description": "only return deals owned by this rep's id"
+            },
+            "min_value": {
+              "type": "number",
+              "description": "only return deals worth at least this amount"
+            }
           },
           "required": []
         }
@@ -99,12 +175,18 @@
       "type": "function",
       "function": {
         "name": "get_activities",
-        "description": "List activities for a deal or a contact (one of the two is required).",
+        "description": "List activities for a deal or a contact. One of deal_id/contact_id is required (not both need to be set, but at least one must be).\n\nReturns: a list of activities, each shaped like:\n{\"id\": 21, \"deal_id\": 4, \"contact_id\": 12, \"type\": \"call\", \"subject\": \"pricing\", \"ts\": \"2026-02-01T12:00:00\", \"rep_id\": 3}",
         "parameters": {
           "type": "object",
           "properties": {
-            "deal_id": {"type": "integer"},
-            "contact_id": {"type": "integer"}
+            "deal_id": {
+              "type": "integer",
+              "description": "only return activities on this deal's id"
+            },
+            "contact_id": {
+              "type": "integer",
+              "description": "only return activities on this contact's id"
+            }
           },
           "required": []
         }
@@ -114,13 +196,26 @@
       "type": "function",
       "function": {
         "name": "get_followups",
-        "description": "Search follow-ups by deal, rep, or status.",
+        "description": "Search follow-ups by deal, rep, or status. All arguments are optional \u2014 omit any you don't need.\n\nReturns: a list of follow-ups, each shaped like:\n{\"id\": 9, \"deal_id\": 4, \"due_date\": \"2026-06-04\", \"note\": \"confirm terms\", \"status\": \"open\", \"rep_id\": 3}",
         "parameters": {
           "type": "object",
           "properties": {
-            "deal_id": {"type": "integer"},
-            "rep_id": {"type": "integer"},
-            "status": {"type": "string", "enum": ["open", "done"]}
+            "deal_id": {
+              "type": "integer",
+              "description": "only return follow-ups on this deal's id"
+            },
+            "rep_id": {
+              "type": "integer",
+              "description": "only return follow-ups owned by this rep's id"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "open",
+                "done"
+              ],
+              "description": "only return follow-ups with this status"
+            }
           },
           "required": []
         }
@@ -130,17 +225,34 @@
       "type": "function",
       "function": {
         "name": "create_contact",
-        "description": "Create a new contact; fails if the email already exists.",
+        "description": "Create a new contact; fails if the email already exists.\n\nReturns: the newly created contact, shaped like:\n{\"id\": 60, \"name\": \"Bob Larsen\", \"email\": \"bob.larsen@wonka.example\", \"phone\": \"+1-555-8335\", \"company\": \"Wonka\", \"rep_id\": 6, \"created_at\": \"2026-06-01\"}",
         "parameters": {
           "type": "object",
           "properties": {
-            "name": {"type": "string"},
-            "email": {"type": "string"},
-            "rep_id": {"type": "integer"},
-            "company": {"type": "string"},
-            "phone": {"type": "string"}
+            "name": {
+              "type": "string",
+              "description": "the contact's full name"
+            },
+            "email": {
+              "type": "string",
+              "description": "must be unique across all contacts"
+            },
+            "rep_id": {
+              "type": "integer",
+              "description": "the id of the rep who owns this contact"
+            },
+            "company": {
+              "type": "string"
+            },
+            "phone": {
+              "type": "string"
+            }
           },
-          "required": ["name", "email", "rep_id"]
+          "required": [
+            "name",
+            "email",
+            "rep_id"
+          ]
         }
       }
     },
@@ -148,18 +260,35 @@
       "type": "function",
       "function": {
         "name": "update_contact",
-        "description": "Update one or more fields on an existing contact.",
+        "description": "Update one or more fields on an existing contact. Only the fields you pass are changed.\n\nReturns: the updated contact, shaped like:\n{\"id\": 7, \"name\": \"Alice Nakamura\", \"email\": \"alice.nakamura@wonka.example\", \"phone\": \"+1-555-9999\", \"company\": \"Wonka\", \"rep_id\": 6, \"created_at\": \"2026-01-14\"}",
         "parameters": {
           "type": "object",
           "properties": {
-            "id": {"type": "integer"},
-            "name": {"type": "string"},
-            "email": {"type": "string"},
-            "company": {"type": "string"},
-            "phone": {"type": "string"},
-            "rep_id": {"type": "integer"}
+            "id": {
+              "type": "integer",
+              "description": "the contact's id"
+            },
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "description": "must be unique across all contacts"
+            },
+            "company": {
+              "type": "string"
+            },
+            "phone": {
+              "type": "string"
+            },
+            "rep_id": {
+              "type": "integer",
+              "description": "reassign this contact to a different rep"
+            }
           },
-          "required": ["id"]
+          "required": [
+            "id"
+          ]
         }
       }
     },
@@ -167,16 +296,38 @@
       "type": "function",
       "function": {
         "name": "create_lead",
-        "description": "Create a new lead for a contact.",
+        "description": "Create a new lead for a contact.\n\nReturns: the newly created lead, shaped like:\n{\"id\": 12, \"contact_id\": 7, \"source\": \"referral\", \"score\": 72, \"status\": \"new\", \"rep_id\": 6, \"created_at\": \"2026-06-01\"}",
         "parameters": {
           "type": "object",
           "properties": {
-            "contact_id": {"type": "integer"},
-            "source": {"type": "string", "enum": ["webform", "referral", "event", "cold_call", "inbound_email"]},
-            "score": {"type": "integer"},
-            "rep_id": {"type": "integer"}
+            "contact_id": {
+              "type": "integer",
+              "description": "the contact this lead is for"
+            },
+            "source": {
+              "type": "string",
+              "enum": [
+                "webform",
+                "referral",
+                "event",
+                "cold_call",
+                "inbound_email"
+              ],
+              "description": "how the lead came in"
+            },
+            "score": {
+              "type": "integer",
+              "description": "defaults to 50 if omitted"
+            },
+            "rep_id": {
+              "type": "integer",
+              "description": "defaults to the contact's own rep if omitted"
+            }
           },
-          "required": ["contact_id", "source"]
+          "required": [
+            "contact_id",
+            "source"
+          ]
         }
       }
     },
@@ -184,16 +335,40 @@
       "type": "function",
       "function": {
         "name": "update_lead",
-        "description": "Update a lead's status, score, and/or source.",
+        "description": "Update a lead's status, score, and/or source. Only the fields you pass are changed.\n\nReturns: the updated lead, shaped like:\n{\"id\": 12, \"contact_id\": 7, \"source\": \"referral\", \"score\": 72, \"status\": \"qualified\", \"rep_id\": 6, \"created_at\": \"2026-01-20\"}",
         "parameters": {
           "type": "object",
           "properties": {
-            "id": {"type": "integer"},
-            "status": {"type": "string", "enum": ["new", "qualified", "unqualified", "converted"]},
-            "score": {"type": "integer"},
-            "source": {"type": "string", "enum": ["webform", "referral", "event", "cold_call", "inbound_email"]}
+            "id": {
+              "type": "integer",
+              "description": "the lead's id"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "new",
+                "qualified",
+                "unqualified",
+                "converted"
+              ]
+            },
+            "score": {
+              "type": "integer"
+            },
+            "source": {
+              "type": "string",
+              "enum": [
+                "webform",
+                "referral",
+                "event",
+                "cold_call",
+                "inbound_email"
+              ]
+            }
           },
-          "required": ["id"]
+          "required": [
+            "id"
+          ]
         }
       }
     },
@@ -201,17 +376,45 @@
       "type": "function",
       "function": {
         "name": "create_deal",
-        "description": "Create a new deal under a lead.",
+        "description": "Create a new deal under a lead.\n\nReturns: the newly created deal, shaped like:\n{\"id\": 4, \"lead_id\": 12, \"name\": \"Acme rollout\", \"stage\": \"prospecting\", \"value\": 45000.0, \"currency\": \"USD\", \"close_date\": null, \"rep_id\": 6, \"created_at\": \"2026-06-01\"}",
         "parameters": {
           "type": "object",
           "properties": {
-            "lead_id": {"type": "integer"},
-            "name": {"type": "string"},
-            "value": {"type": "number"},
-            "stage": {"type": "string", "enum": ["prospecting", "qualification", "proposal", "negotiation", "closing", "won", "lost"]},
-            "close_date": {"type": "string"}
+            "lead_id": {
+              "type": "integer",
+              "description": "the lead this deal is under"
+            },
+            "name": {
+              "type": "string",
+              "description": "a short label for the deal"
+            },
+            "value": {
+              "type": "number",
+              "description": "the deal's monetary value"
+            },
+            "stage": {
+              "type": "string",
+              "enum": [
+                "prospecting",
+                "qualification",
+                "proposal",
+                "negotiation",
+                "closing",
+                "won",
+                "lost"
+              ],
+              "description": "defaults to \"prospecting\" if omitted"
+            },
+            "close_date": {
+              "type": "string",
+              "description": "expected close date, \"YYYY-MM-DD\""
+            }
           },
-          "required": ["lead_id", "name", "value"]
+          "required": [
+            "lead_id",
+            "name",
+            "value"
+          ]
         }
       }
     },
@@ -219,16 +422,37 @@
       "type": "function",
       "function": {
         "name": "update_deal",
-        "description": "Update a deal's stage, value, and/or close date.",
+        "description": "Update a deal's stage, value, and/or close date. Only the fields you pass are changed.\n\nReturns: the updated deal, shaped like:\n{\"id\": 4, \"lead_id\": 12, \"name\": \"Acme rollout\", \"stage\": \"negotiation\", \"value\": 45000.0, \"currency\": \"USD\", \"close_date\": \"2026-06-01\", \"rep_id\": 3, \"created_at\": \"2026-01-15\"}",
         "parameters": {
           "type": "object",
           "properties": {
-            "id": {"type": "integer"},
-            "stage": {"type": "string", "enum": ["prospecting", "qualification", "proposal", "negotiation", "closing", "won", "lost"]},
-            "value": {"type": "number"},
-            "close_date": {"type": "string"}
+            "id": {
+              "type": "integer",
+              "description": "the deal's id"
+            },
+            "stage": {
+              "type": "string",
+              "enum": [
+                "prospecting",
+                "qualification",
+                "proposal",
+                "negotiation",
+                "closing",
+                "won",
+                "lost"
+              ]
+            },
+            "value": {
+              "type": "number"
+            },
+            "close_date": {
+              "type": "string",
+              "description": "\"YYYY-MM-DD\""
+            }
           },
-          "required": ["id"]
+          "required": [
+            "id"
+          ]
         }
       }
     },
@@ -236,16 +460,36 @@
       "type": "function",
       "function": {
         "name": "log_activity",
-        "description": "Log a call, email, meeting, or note on a deal or contact. If only deal_id is given, contact_id is filled in automatically from the deal's contact.",
+        "description": "Log a call, email, meeting, or note on a deal or contact. At least one of deal_id/contact_id should be set; if you pass only deal_id, contact_id is filled in automatically from the deal's contact.\n\nReturns: the newly created activity, shaped like:\n{\"id\": 21, \"deal_id\": 4, \"contact_id\": 12, \"type\": \"call\", \"subject\": \"pricing\", \"ts\": \"2026-06-01T12:00:00\", \"rep_id\": 3}",
         "parameters": {
           "type": "object",
           "properties": {
-            "type": {"type": "string", "enum": ["call", "email", "meeting", "note"]},
-            "subject": {"type": "string"},
-            "deal_id": {"type": "integer"},
-            "contact_id": {"type": "integer"}
+            "type": {
+              "type": "string",
+              "enum": [
+                "call",
+                "email",
+                "meeting",
+                "note"
+              ]
+            },
+            "subject": {
+              "type": "string",
+              "description": "a short description of the activity"
+            },
+            "deal_id": {
+              "type": "integer",
+              "description": "the deal this activity is logged against"
+            },
+            "contact_id": {
+              "type": "integer",
+              "description": "the contact this activity is logged against"
+            }
           },
-          "required": ["type", "subject"]
+          "required": [
+            "type",
+            "subject"
+          ]
         }
       }
     },
@@ -253,15 +497,26 @@
       "type": "function",
       "function": {
         "name": "schedule_followup",
-        "description": "Schedule a follow-up on a deal.",
+        "description": "Schedule a follow-up on a deal.\n\nReturns: the newly created follow-up, shaped like:\n{\"id\": 9, \"deal_id\": 4, \"due_date\": \"2026-06-04\", \"note\": \"confirm terms\", \"status\": \"open\", \"rep_id\": 3}",
         "parameters": {
           "type": "object",
           "properties": {
-            "deal_id": {"type": "integer"},
-            "due_date": {"type": "string"},
-            "note": {"type": "string"}
+            "deal_id": {
+              "type": "integer",
+              "description": "the deal this follow-up is on"
+            },
+            "due_date": {
+              "type": "string",
+              "description": "\"YYYY-MM-DD\""
+            },
+            "note": {
+              "type": "string"
+            }
           },
-          "required": ["deal_id", "due_date"]
+          "required": [
+            "deal_id",
+            "due_date"
+          ]
         }
       }
     },
@@ -269,16 +524,31 @@
       "type": "function",
       "function": {
         "name": "update_followup",
-        "description": "Update a follow-up's status (e.g. mark done), due date, and/or note.",
+        "description": "Update a follow-up's status (e.g. mark done), due date, and/or note.\n\nReturns: the updated follow-up, shaped like:\n{\"id\": 9, \"deal_id\": 4, \"due_date\": \"2026-06-04\", \"note\": \"confirm terms\", \"status\": \"done\", \"rep_id\": 3}",
         "parameters": {
           "type": "object",
           "properties": {
-            "id": {"type": "integer"},
-            "status": {"type": "string", "enum": ["open", "done"]},
-            "due_date": {"type": "string"},
-            "note": {"type": "string"}
+            "id": {
+              "type": "integer"
+            },
+            "status": {
+              "type": "string",
+              "enum": [
+                "open",
+                "done"
+              ]
+            },
+            "due_date": {
+              "type": "string",
+              "description": "\"YYYY-MM-DD\""
+            },
+            "note": {
+              "type": "string"
+            }
           },
-          "required": ["id"]
+          "required": [
+            "id"
+          ]
         }
       }
     }
@@ -291,10 +561,23 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "code": {"type": "string", "description": "The code to run."},
-          "lang": {"type": "string", "enum": ["python", "js", "ts"]}
+          "code": {
+            "type": "string",
+            "description": "The code to run."
+          },
+          "lang": {
+            "type": "string",
+            "enum": [
+              "python",
+              "js",
+              "ts"
+            ]
+          }
         },
-        "required": ["code", "lang"]
+        "required": [
+          "code",
+          "lang"
+        ]
       }
     }
   }

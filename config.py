@@ -6,6 +6,21 @@ from __future__ import annotations
 TURN_BUDGET = 20
 
 
+# ── cost accounting (src/meter/meter.py) ─────────────────────────────────
+# Cost is the dependent variable of the code-vs-MCP question: code-mode's
+# whole claim is that it does the same work for fewer tokens. But it does not
+# make the work free — it moves it out of the token stream and into executed
+# code, i.e. into sandbox compute. Pricing only tokens would credit code-mode
+# for the tokens it saves while ignoring the compute it spends, overstating its
+# advantage. So the sandbox second is priced too.
+#
+# This is a placeholder rate, deliberately kept here as one editable knob so a
+# reader can re-derive every cost figure under their own assumptions rather than
+# trusting ours. Default ≈ one cloud vCPU-second (AWS Fargate on-demand,
+# ~$0.04048 per vCPU-hour ÷ 3600). Per-model token prices live in models.yaml.
+SANDBOX_USD_PER_SECOND = 0.04048 / 3600
+
+
 TRAJECTORY_DIR = "results/trajectories"
 
 # Retry backoff (seconds) for a momentarily-unreachable container.
@@ -20,11 +35,11 @@ CONTAINER_READY_TIMEOUT_S = 15.0        # max wait for a container to answer /he
 CONTAINER_READY_POLL_INTERVAL_S = 0.3
 CONTAINER_READY_REQUEST_TIMEOUT_S = 1.0
 
-TOOL_SERVER_IMAGE = "ent-agent-bench/tool-server"
+TOOL_SERVER_IMAGE = "action-surface-bench/tool-server"
 EXECUTOR_IMAGES = {
-    "python": "ent-agent-bench/python-executor",
-    "js": "ent-agent-bench/js-executor",
-    "ts": "ent-agent-bench/ts-executor",
+    "python": "action-surface-bench/python-executor",
+    "js": "action-surface-bench/js-executor",
+    "ts": "action-surface-bench/ts-executor",
 }
 
 # ── task generation (build_tasks.py / crm_db.py / world_builder.py) ──────

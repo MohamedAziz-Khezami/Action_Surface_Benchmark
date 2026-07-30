@@ -1,37 +1,39 @@
 {
-  "query": "Ugh, the contact Mona Novak at Soylent again. Just log a note saying 'send recap' for them, then update their phone number to +1-555-7064, then log a call about 'pricing' with them so we can move on. contact_id please.",
+  "query": "Ugh, the prospecting deal with Soylent again. Just schedule a follow-up for 2026-06-08 with the note 'confirm terms', then log a email about 'contract' on it, then move it to the closing stage so we can move on. deal_id please.",
   "answer_keys": [
-    "contact_id"
+    "deal_id"
   ],
   "ground_truth": {
-    "contact_id": 29
+    "deal_id": 24
   },
   "expected_added": {
+    "followups": [
+      {
+        "deal_id": 24,
+        "due_date": "2026-06-08"
+      }
+    ],
     "activities": [
       {
-        "contact_id": 29,
-        "type": "note",
-        "subject": "send recap"
-      },
-      {
-        "contact_id": 29,
-        "type": "call",
-        "subject": "pricing"
+        "deal_id": 24,
+        "type": "email",
+        "subject": "contract"
       }
     ]
   },
   "expected_changed": {
-    "contacts": [
+    "deals": [
       {
-        "id": 29,
+        "id": 24,
         "fields": {
-          "phone": "+1-555-7064"
+          "stage": "closing"
         }
       }
     ]
   },
   "exact_added_count": {
-    "activities": 2
+    "followups": 1,
+    "activities": 1
   },
   "forbidden": {
     "reps": [
@@ -41,6 +43,7 @@
     ],
     "contacts": [
       "added",
+      "changed",
       "removed"
     ],
     "leads": [
@@ -50,7 +53,6 @@
     ],
     "deals": [
       "added",
-      "changed",
       "removed"
     ],
     "activities": [
@@ -58,7 +60,6 @@
       "removed"
     ],
     "followups": [
-      "added",
       "changed",
       "removed"
     ]
@@ -68,6 +69,6 @@
   "task_id": "task_065",
   "world_seed": 1065,
   "difficulty": "hard",
-  "template": "act_on_a_contact",
+  "template": "act_on_a_deal",
   "pattern": "single_record_act"
 }

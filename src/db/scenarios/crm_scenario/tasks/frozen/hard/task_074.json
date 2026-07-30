@@ -1,25 +1,38 @@
 {
-  "query": "We're behind on the new lead from Elif Cole and the quarter is closing \u2014 mark it as unqualified, then set its score to 61, then correct its source to referral, and don't touch anything else. Send me the lead_id when done.",
+  "query": "We're behind on the contact Elif Cole at Globex and the quarter is closing \u2014 log a note saying 'send recap' for them, then update their phone number to +1-555-5196, then log a call about 'kickoff' with them, and don't touch anything else. Send me the contact_id when done.",
   "answer_keys": [
-    "lead_id"
+    "contact_id"
   ],
   "ground_truth": {
-    "lead_id": 38
+    "contact_id": 62
   },
-  "expected_added": {},
-  "expected_changed": {
-    "leads": [
+  "expected_added": {
+    "activities": [
       {
-        "id": 38,
+        "contact_id": 62,
+        "type": "note",
+        "subject": "send recap"
+      },
+      {
+        "contact_id": 62,
+        "type": "call",
+        "subject": "kickoff"
+      }
+    ]
+  },
+  "expected_changed": {
+    "contacts": [
+      {
+        "id": 62,
         "fields": {
-          "status": "unqualified",
-          "score": 61,
-          "source": "referral"
+          "phone": "+1-555-5196"
         }
       }
     ]
   },
-  "exact_added_count": {},
+  "exact_added_count": {
+    "activities": 2
+  },
   "forbidden": {
     "reps": [
       "added",
@@ -28,11 +41,11 @@
     ],
     "contacts": [
       "added",
-      "changed",
       "removed"
     ],
     "leads": [
       "added",
+      "changed",
       "removed"
     ],
     "deals": [
@@ -41,7 +54,6 @@
       "removed"
     ],
     "activities": [
-      "added",
       "changed",
       "removed"
     ],
@@ -56,6 +68,6 @@
   "task_id": "task_074",
   "world_seed": 1074,
   "difficulty": "hard",
-  "template": "act_on_a_lead",
+  "template": "act_on_a_contact",
   "pattern": "single_record_act"
 }

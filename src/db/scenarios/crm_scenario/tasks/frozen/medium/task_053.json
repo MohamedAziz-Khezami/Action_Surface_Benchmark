@@ -1,10 +1,10 @@
 {
-  "query": "Among our reps, sum the open pipeline for Bob Okafor and Kira Moreau only -- do not include Jonas Larsen, even though I'm mentioning them here. Report the total as a plain number for total_value.",
+  "query": "How many of Bob Okafor's follow-ups are due on or before 2026-06-08? Report the count as n_due.",
   "answer_keys": [
-    "total_value"
+    "n_due"
   ],
   "ground_truth": {
-    "total_value": 42500.0
+    "n_due": 3
   },
   "expected_added": {},
   "expected_changed": {},
@@ -41,11 +41,11 @@
       "removed"
     ]
   },
-  "n_functions": 3,
+  "n_functions": 2,
   "n_actions": 0,
   "task_id": "task_053",
   "world_seed": 1053,
   "difficulty": "medium",
-  "template": "sum_pipeline_with_distractor",
-  "pattern": "parallel_independent"
+  "template": "followups_due_within_window",
+  "pattern": "single_query_aggregate"
 }

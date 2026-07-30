@@ -1,0 +1,59 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: followups_due_within_window   (medium tier — read-only)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "How many of Grace Silva's follow-ups are due on or before 2026-06-08?
+#    Report the count as n_due."
+#
+# WHAT IT TESTS:
+#   A count with a date filter the tool API cannot express: get_followups
+#   filters by deal/rep/status, NOT by due date. So the model must fetch the
+#   rep's follow-ups and compare each due_date to the cutoff itself. Follow-
+#   ups due after the cutoff must be excluded.
+#
+# HOW IT'S MADE VALID:
+#   The in-window count is DECIDED first (n_in). Exactly that many follow-ups
+#   are planted with due dates safely before the cutoff, and n_out are planted
+#   safely after it — with a clear gap around the cutoff so no follow-up is
+#   ambiguously "on the boundary". All belong to the reserved rep's deals;
+#   background follow-ups never do.
+# ──────────────────────────────────────────────────────────────────────
+name: followups_due_within_window
+pattern: single_query_aggregate
+answer_keys: [n_due]
+n_functions: 2      # fetch the rep's follow-ups + filter/count by date
+n_actions: 0
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  n_in: {randint: [2, 4]}      # due on/before the cutoff -> counted
+  n_out: {randint: [1, 3]}     # due after the cutoff -> excluded
+  cutoff_date: {sim_date_offset: 7}   # SIM_TODAY + 7 days, the query's cutoff
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  # one deal to hang the follow-ups on
+  - {ref: the_lead, table: leads, row: {contact_id: "@the_contact"}}
+  - {ref: the_deal, table: deals, row: {lead_id: "@the_lead", rep_id: "@the_rep"}}
+  # in-window: due between SIM-10 and SIM+4 (all <= cutoff SIM+7, gap of 3 days)
+  - {ref: in_followups, table: followups, repeat: "{n_in}",
+     row: {deal_id: "@the_deal", due_date: {sim_date_offset: {randint: [-10, 4]}}, status: open}}
+  # out-of-window: due between SIM+10 and SIM+30 (all > cutoff, gap of 3 days)
+  - {ref: out_followups, table: followups, repeat: "{n_out}",
+     row: {deal_id: "@the_deal", due_date: {sim_date_offset: {randint: [10, 30]}}, status: open}}
+
+# ── 3. what a correct solution must have changed: NOTHING (read-only) ──
+effects: {}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {n_due: "{n_in}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  How many of {rep_name}'s follow-ups are due on or before {cutoff_date}?
+  Report the count as n_due.

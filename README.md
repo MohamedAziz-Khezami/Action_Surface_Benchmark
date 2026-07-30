@@ -1,29 +1,37 @@
-# Ent-Agent-Bench
+# action-surface-bench
 
-A benchmark that answers one question: when an LLM agent needs to use tools, is it better off **writing code** that calls those tools, or **emitting structured JSON tool calls** the way most agent frameworks do today?
+A controlled study of one variable: **the agent's action surface.**
 
-It runs the same tasks against the same simulated CRM through four different "surfaces" (Python code, JavaScript code, TypeScript code, and JSON/MCP-style structured calls) and grades every attempt the same way, so the four surfaces are directly comparable, model for model, task for task.
+When an LLM agent needs to use tools, is it better off **writing code** that calls those tools, or **emitting structured JSON tool calls** the way most agent frameworks do today?
 
-This document explains the whole system: the scenario, how tasks are generated, how an episode actually runs, how it's graded, and how to run it yourself.
+Every other agent benchmark fixes the action interface and varies the model. This one does the opposite: it holds the task, the world, the data, the tool implementations, the grader, the trust boundary, and the turn budget **constant**, and varies only how the model is allowed to act — across four surfaces (Python, JavaScript, TypeScript, and JSON/MCP-style structured calls). That control is the point of the benchmark.
+
+```
+independent variables:  action surface  ×  tool-catalog size  ×  model
+held constant:          everything else
+```
+
+This document explains the whole system: the testbed, how tasks are generated, how an episode actually runs, how it's graded, and how to run it yourself.
 
 ---
 
 ## Contents
 
 1. [Why this exists](#why-this-exists)
-2. [The big picture](#the-big-picture)
-3. [The CRM scenario](#the-crm-scenario)
-4. [The four surfaces](#the-four-surfaces)
-5. [How a task is generated](#how-a-task-is-generated)
-6. [How one episode runs](#how-one-episode-runs)
-7. [How an episode is graded](#how-an-episode-is-graded)
-8. [The model registry](#the-model-registry)
-9. [Configuration](#configuration)
-10. [Running the benchmark](#running-the-benchmark)
-11. [Output layout](#output-layout)
-12. [Testing and validation](#testing-and-validation)
-13. [Project layout](#project-layout)
-14. [Known limitations](#known-limitations)
+2. [Why a CRM is the testbed](#why-a-crm-is-the-testbed)
+3. [The big picture](#the-big-picture)
+4. [The CRM scenario](#the-crm-scenario)
+5. [The four surfaces](#the-four-surfaces)
+6. [How a task is generated](#how-a-task-is-generated)
+7. [How one episode runs](#how-one-episode-runs)
+8. [How an episode is graded](#how-an-episode-is-graded)
+9. [The model registry](#the-model-registry)
+10. [Configuration](#configuration)
+11. [Running the benchmark](#running-the-benchmark)
+12. [Output layout](#output-layout)
+13. [Testing and validation](#testing-and-validation)
+14. [Project layout](#project-layout)
+15. [Known limitations](#known-limitations)
 
 ---
 
@@ -34,6 +42,25 @@ Most agent benchmarks test tool use through a fixed structured-calling protocol:
 A model that can write code can also call tools directly from that code  loop over results, filter them, batch several calls together, compute a value inline  all inside one turn, instead of one call per turn. Whether that actually helps, on real multi-step tasks, is an empirical question this benchmark is built to answer.
 
 So every task in this benchmark is run through both styles against the identical scenario, the identical data, and the identical grading logic. The only thing that changes is how the model is allowed to act.
+
+---
+
+## Why a CRM is the testbed
+
+The world here is a small simulated CRM. That choice is about **structure, not business realism** — this is not a benchmark of enterprise capability, and it makes no claim about how agents perform at sales work. The CRM is an instrument, selected because it supplies exactly the properties an action-surface comparison needs:
+
+| Property | What the CRM gives | Why the study needs it |
+|---|---|---|
+| **Relational depth** | a real `rep → contact → lead → deal → followup` chain | forces multi-hop lookups, so tasks can't be solved in a single call |
+| **Mutations with a clean diff** | every table has create/update actions | grading is a deterministic before/after state diff, and unauthorized writes ("blast radius") become measurable |
+| **Iteration + branching** | "act on each overdue follow-up" | per-item conditional logic — the exact shape where code-mode's ability to batch either wins or loses |
+| **A frozen clock** | `SIM_TODAY`, never the wall clock | date-relative tasks ("overdue", "within 30 days") stay reproducible forever |
+| **A regular schema** | one tool per table, uniform argument shapes | the tool catalog pads cleanly from 17 to 500 tools for the catalog-size sweep |
+| **Low ambiguity** | a widely-understood domain | failures attribute to the action interface, not to the model misreading an exotic world |
+
+Any domain with these six properties would serve. A CRM is simply a convenient, well-understood one that has all of them at once.
+
+**Acknowledged limitation.** A single familiar domain cannot rule out that model familiarity with CRMs inflates absolute scores. It does not confound the *comparison* — every surface sees the same tools over the same world, so any domain familiarity helps all of them equally — but generalization across domains is future work, not something this corpus demonstrates.
 
 ---
 

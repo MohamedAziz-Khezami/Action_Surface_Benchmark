@@ -1,10 +1,10 @@
 {
-  "query": "Among our reps, sum the open pipeline for Rosa Diaz and Femi Haddad only -- do not include Liam Iversen, even though I'm mentioning them here. Report the total as a plain number for total_value.",
+  "query": "Sum the value of Rosa Diaz's deals that are in the proposal or negotiation stage. Report the total as total_value.",
   "answer_keys": [
     "total_value"
   ],
   "ground_truth": {
-    "total_value": 71500.0
+    "total_value": 95000.0
   },
   "expected_added": {},
   "expected_changed": {},
@@ -41,11 +41,11 @@
       "removed"
     ]
   },
-  "n_functions": 3,
+  "n_functions": 2,
   "n_actions": 0,
   "task_id": "task_037",
   "world_seed": 1037,
   "difficulty": "medium",
-  "template": "sum_pipeline_with_distractor",
+  "template": "sum_deals_in_stages",
   "pattern": "parallel_independent"
 }

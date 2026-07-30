@@ -1,5 +1,5 @@
 {
-  "name": "ent-agent-bench-ts-executor",
+  "name": "action-surface-bench-ts-executor",
   "private": true,
   "description": "TS code-mode execution container for the benchmark harness, with real semantic type-checking.",
   "dependencies": {

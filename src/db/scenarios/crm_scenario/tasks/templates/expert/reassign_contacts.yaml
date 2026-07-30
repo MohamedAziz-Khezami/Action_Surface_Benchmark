@@ -1,0 +1,60 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: reassign_contacts   (expert tier)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "Reassign every contact owned by Omar Haddad to Priya Chen. Report how
+#    many you moved as n_moved."
+#
+# WHAT IT TESTS:
+#   Iteration over a group WITH A TARGET — the model must find all of one
+#   rep's contacts, look up a second rep, and update every one to point at
+#   that second rep. Distinct from update_every_matching_deal (which sets a
+#   field to a literal): here the new value is itself the id of another
+#   entity that must be looked up first. Missing one, or moving to the wrong
+#   rep, fails the exact cardinality + field checks.
+#
+#   NOTE ON SOLVABILITY: this reassigns CONTACTS, not deals — update_contact
+#   exposes rep_id, whereas update_deal does not, so a "reassign the deals"
+#   version of this task would be impossible to complete with the available
+#   tools. The task is only valid because the mutation it requires is one the
+#   tool API actually offers.
+#
+# HOW IT'S MADE VALID:
+#   The group size is DECIDED first (n_contacts) and exactly that many
+#   contacts are planted under a reserved source rep. Background contacts can
+#   never belong to either reserved rep (reference partitioning), so the
+#   group is closed by construction. The target rep is reserved and owns no
+#   contacts of its own, so "move them to that rep" has one unambiguous id.
+# ──────────────────────────────────────────────────────────────────────
+name: reassign_contacts
+pattern: iterate_over_set
+answer_keys: [n_moved]
+n_functions: "2 + n_contacts"   # find source's contacts + find target rep + one update each
+n_actions: "{n_contacts}"
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  from_rep_name: {draw: person_name}
+  to_rep_name: {draw: person_name}
+  n_contacts: {choice: [2, 3, 4]}
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: from_rep, table: reps, row: {name: "{from_rep_name}"}}
+  - {ref: to_rep, table: reps, row: {name: "{to_rep_name}"}}
+  # the group that must move: every contact owned by the source rep
+  - {ref: the_contacts, table: contacts, repeat: "{n_contacts}", row: {rep_id: "@from_rep"}}
+
+# ── 3. what a correct solution must have changed: every contact -> target rep ─
+effects:
+  - for_each: the_contacts
+    changed:
+      - {table: contacts, id: "@item", fields: {rep_id: "@to_rep"}}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {n_moved: "{n_contacts}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  Reassign every contact owned by {from_rep_name} to {to_rep_name}. Report
+  how many you moved as n_moved.

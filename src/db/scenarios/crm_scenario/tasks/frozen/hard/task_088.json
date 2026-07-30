@@ -1,37 +1,38 @@
 {
-  "query": "Following up from this morning's pipeline review: the contact Bob Moreau at Vandelay came up again. log a note saying 'check budget' for them, then log a email about 'kickoff' with them, then update their phone number to +1-555-8329. Include the contact_id in your reply.",
+  "query": "Log a note with the subject 'quarterly review' on every open deal owned by Priya Lee. Report how many you logged as n_logged.",
   "answer_keys": [
-    "contact_id"
+    "n_logged"
   ],
   "ground_truth": {
-    "contact_id": 34
+    "n_logged": 4
   },
   "expected_added": {
     "activities": [
       {
-        "contact_id": 34,
+        "deal_id": 17,
         "type": "note",
-        "subject": "check budget"
+        "subject": "quarterly review"
       },
       {
-        "contact_id": 34,
-        "type": "email",
-        "subject": "kickoff"
-      }
-    ]
-  },
-  "expected_changed": {
-    "contacts": [
+        "deal_id": 12,
+        "type": "note",
+        "subject": "quarterly review"
+      },
       {
-        "id": 34,
-        "fields": {
-          "phone": "+1-555-8329"
-        }
+        "deal_id": 10,
+        "type": "note",
+        "subject": "quarterly review"
+      },
+      {
+        "deal_id": 32,
+        "type": "note",
+        "subject": "quarterly review"
       }
     ]
   },
+  "expected_changed": {},
   "exact_added_count": {
-    "activities": 2
+    "activities": 4
   },
   "forbidden": {
     "reps": [
@@ -41,6 +42,7 @@
     ],
     "contacts": [
       "added",
+      "changed",
       "removed"
     ],
     "leads": [
@@ -63,11 +65,11 @@
       "removed"
     ]
   },
-  "n_functions": 4,
-  "n_actions": 3,
+  "n_functions": 5,
+  "n_actions": 4,
   "task_id": "task_088",
   "world_seed": 1088,
   "difficulty": "hard",
-  "template": "act_on_a_contact",
-  "pattern": "single_record_act"
+  "template": "log_note_on_each_open_deal",
+  "pattern": "iterate_over_set"
 }
