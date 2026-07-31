@@ -1,0 +1,64 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: second_highest_value_deal   (hard tier — read-only)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "Among Grace Silva's deals, which one has the second-highest value?
+#    Answer with its id as deal_id."
+#
+# WHAT IT TESTS:
+#   A second-order statistic: not the maximum but the runner-up. The model
+#   must gather the contact's deals and identify the deal ranked exactly
+#   second by value — a harder ask than argmax, since it must track two
+#   positions, not one, and not be fooled into reporting the top deal.
+#
+# HOW IT'S MADE VALID:
+#   Three value bands are DECIDED with clear gaps: one winner (highest), one
+#   runner-up (a clear step below the winner but well above the rest), and
+#   several lower deals. The runner-up is the unambiguous answer. Background
+#   deals never belong to the reserved contact, so the ranking set is closed.
+#   Anchor-uniqueness and the value gaps are re-checked in the audit.
+# ──────────────────────────────────────────────────────────────────────
+name: second_highest_value_deal
+pattern: dependent_chain
+answer_keys: [deal_id]
+n_functions: 3      # find the contact's leads + gather deals + pick the runner-up
+n_actions: 0
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  # deal values sit on a 5,000..120,000 grid; three bands with clear gaps
+  winner_value: {value_between: [95000, 120000]}
+  runner_value: {value_between: [55000, 80000]}
+  n_others: {choice: [2, 3]}
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  # the winner (highest) — NOT the answer
+  - {ref: winner_lead, table: leads, row: {contact_id: "@the_contact"}}
+  - {ref: winner_deal, table: deals,
+     row: {lead_id: "@winner_lead", rep_id: "@the_rep", value: "{winner_value}"}}
+  # the runner-up (second highest) — THE answer
+  - {ref: runner_lead, table: leads, row: {contact_id: "@the_contact"}}
+  - {ref: runner_deal, table: deals,
+     row: {lead_id: "@runner_lead", rep_id: "@the_rep", value: "{runner_value}"}}
+  # the rest — a clear step below the runner-up
+  - {ref: other_leads, table: leads, repeat: "{n_others}", row: {contact_id: "@the_contact"}}
+  - {ref: other_deals, table: deals, repeat: "{n_others}",
+     row: {lead_id: "@other_leads", rep_id: "@the_rep",
+           value: {value_between: [5000, 40000]}}}
+
+# ── 3. what a correct solution must have changed: NOTHING (read-only) ──
+effects: {}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {deal_id: "@runner_deal"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  Among {contact_name}'s deals, which one has the second-highest value? Answer
+  with its id as deal_id.

@@ -1,22 +1,13 @@
 {
-  "query": "Please push its due date to 2026-06-06 on the overdue follow-up on the Hooli deal. Report the followup_id.",
+  "query": "What's the combined value of all open deals owned by Mona Cole and Rosa Mo? Report the total as a plain number for total_value.",
   "answer_keys": [
-    "followup_id"
+    "total_value"
   ],
   "ground_truth": {
-    "followup_id": 16
+    "total_value": 115000.0
   },
   "expected_added": {},
-  "expected_changed": {
-    "followups": [
-      {
-        "id": 16,
-        "fields": {
-          "due_date": "2026-06-06"
-        }
-      }
-    ]
-  },
+  "expected_changed": {},
   "exact_added_count": {},
   "forbidden": {
     "reps": [
@@ -46,14 +37,15 @@
     ],
     "followups": [
       "added",
+      "changed",
       "removed"
     ]
   },
-  "n_functions": 2,
-  "n_actions": 1,
+  "n_functions": 3,
+  "n_actions": 0,
   "task_id": "task_002",
   "world_seed": 1002,
   "difficulty": "easy",
-  "template": "act_on_a_followup",
-  "pattern": "single_record_act"
+  "template": "sum_pipeline_by_reps",
+  "pattern": "parallel_independent"
 }

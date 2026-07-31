@@ -1,0 +1,59 @@
+{
+  "query": "Check the prospecting deal with Globex. If its value is over $75,000, move it to the negotiation stage. Otherwise, log a note saying 'check with finance' on it. Report deal_id.",
+  "answer_keys": [
+    "deal_id"
+  ],
+  "ground_truth": {
+    "deal_id": 2
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "deals": [
+      {
+        "id": 2,
+        "fields": {
+          "stage": "negotiation"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 2,
+  "n_actions": 1,
+  "task_id": "task_228",
+  "world_seed": 1228,
+  "difficulty": "expert",
+  "template": "decide_by_deal_value",
+  "pattern": "conditional_branch"
+}

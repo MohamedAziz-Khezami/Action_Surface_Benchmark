@@ -1,0 +1,77 @@
+{
+  "query": "Reassign every contact owned by Priya Weber to Omar Haddad. Report how many you moved as n_moved.",
+  "answer_keys": [
+    "n_moved"
+  ],
+  "ground_truth": {
+    "n_moved": 4
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "contacts": [
+      {
+        "id": 4,
+        "fields": {
+          "rep_id": 5
+        }
+      },
+      {
+        "id": 16,
+        "fields": {
+          "rep_id": 5
+        }
+      },
+      {
+        "id": 29,
+        "fields": {
+          "rep_id": 5
+        }
+      },
+      {
+        "id": 24,
+        "fields": {
+          "rep_id": 5
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 6,
+  "n_actions": 4,
+  "task_id": "task_233",
+  "world_seed": 1233,
+  "difficulty": "expert",
+  "template": "reassign_contacts",
+  "pattern": "iterate_over_set"
+}

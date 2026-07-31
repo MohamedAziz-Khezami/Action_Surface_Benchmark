@@ -1,0 +1,71 @@
+{
+  "query": "Mark every closing-stage deal owned by Priya Moreau that is worth more than $40500.0 as won. Report how many you closed as n_won.",
+  "answer_keys": [
+    "n_won"
+  ],
+  "ground_truth": {
+    "n_won": 3
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "deals": [
+      {
+        "id": 26,
+        "fields": {
+          "stage": "won"
+        }
+      },
+      {
+        "id": 33,
+        "fields": {
+          "stage": "won"
+        }
+      },
+      {
+        "id": 18,
+        "fields": {
+          "stage": "won"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 3,
+  "task_id": "task_171",
+  "world_seed": 1171,
+  "difficulty": "hard",
+  "template": "close_won_high_value_deals",
+  "pattern": "conditional_branch"
+}

@@ -1,0 +1,61 @@
+{
+  "query": "Ugh, the new lead from Quinn Okafor again. Just mark it as unqualified, then correct its source to inbound_email, then set its score to 85 so we can move on. lead_id please.",
+  "answer_keys": [
+    "lead_id"
+  ],
+  "ground_truth": {
+    "lead_id": 13
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "leads": [
+      {
+        "id": 13,
+        "fields": {
+          "status": "unqualified",
+          "source": "inbound_email",
+          "score": 85
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 3,
+  "task_id": "task_125",
+  "world_seed": 1125,
+  "difficulty": "hard",
+  "template": "act_on_a_lead",
+  "pattern": "single_record_act"
+}

@@ -1,0 +1,71 @@
+{
+  "query": "Add 10 to the score of every lead belonging to Jonas Ruiz. Report how many you updated as n_updated.",
+  "answer_keys": [
+    "n_updated"
+  ],
+  "ground_truth": {
+    "n_updated": 3
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "leads": [
+      {
+        "id": 18,
+        "fields": {
+          "score": 64
+        }
+      },
+      {
+        "id": 24,
+        "fields": {
+          "score": 39
+        }
+      },
+      {
+        "id": 40,
+        "fields": {
+          "score": 57
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 3,
+  "task_id": "task_205",
+  "world_seed": 1205,
+  "difficulty": "expert",
+  "template": "increment_lead_scores",
+  "pattern": "iterate_over_set"
+}

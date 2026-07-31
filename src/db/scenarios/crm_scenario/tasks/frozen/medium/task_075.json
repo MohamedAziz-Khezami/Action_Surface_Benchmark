@@ -1,0 +1,51 @@
+{
+  "query": "How many of Femi Larsen's follow-ups are overdue? Report the count as n_overdue.",
+  "answer_keys": [
+    "n_overdue"
+  ],
+  "ground_truth": {
+    "n_overdue": 3
+  },
+  "expected_added": {},
+  "expected_changed": {},
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 2,
+  "n_actions": 0,
+  "task_id": "task_075",
+  "world_seed": 1075,
+  "difficulty": "medium",
+  "template": "count_overdue_followups",
+  "pattern": "single_query_aggregate"
+}

@@ -1,13 +1,22 @@
 {
-  "query": "What's the combined value of all open deals owned by Femi Cole and Noor Larsen? Report the total as a plain number for total_value.",
+  "query": "Our overdue follow-up on the Initech deal needs attention: push its due date to 2026-06-08. Give me the id as followup_id.",
   "answer_keys": [
-    "total_value"
+    "followup_id"
   ],
   "ground_truth": {
-    "total_value": 76500.0
+    "followup_id": 7
   },
   "expected_added": {},
-  "expected_changed": {},
+  "expected_changed": {
+    "followups": [
+      {
+        "id": 7,
+        "fields": {
+          "due_date": "2026-06-08"
+        }
+      }
+    ]
+  },
   "exact_added_count": {},
   "forbidden": {
     "reps": [
@@ -37,15 +46,14 @@
     ],
     "followups": [
       "added",
-      "changed",
       "removed"
     ]
   },
-  "n_functions": 3,
-  "n_actions": 0,
+  "n_functions": 2,
+  "n_actions": 1,
   "task_id": "task_019",
   "world_seed": 1019,
   "difficulty": "easy",
-  "template": "sum_pipeline_by_reps",
-  "pattern": "parallel_independent"
+  "template": "act_on_a_followup",
+  "pattern": "single_record_act"
 }

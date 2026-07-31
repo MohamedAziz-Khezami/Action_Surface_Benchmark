@@ -1,0 +1,57 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: most_common_lead_source   (hard tier — read-only)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "What is the most common lead source among Grace Silva's leads? Answer
+#    with the source as source."
+#
+# WHAT IT TESTS:
+#   A categorical MODE (argmax over a grouping): the model must gather the
+#   contact's leads, tally them by source, and report the single most
+#   frequent source. This is a group-and-count-then-pick-the-top, which no
+#   tool does — get/find returns rows, not tallies.
+#
+# HOW IT'S MADE VALID:
+#   The winning source is DECIDED first and planted n_mode times (>= 3). Each
+#   of the OTHER four sources is planted exactly once, so the mode wins by a
+#   clear margin (n_mode vs 1) and is unique. Background leads never belong to
+#   the reserved contact, so the tally is closed by construction.
+# ──────────────────────────────────────────────────────────────────────
+name: most_common_lead_source
+pattern: single_query_aggregate
+answer_keys: [source]
+n_functions: 2      # find the contact's leads + tally by source
+n_actions: 0
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  mode_source: {choice: [webform, referral, event, cold_call, inbound_email]}
+  n_mode: {choice: [3, 4]}   # extra copies of the winning source
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  # one lead of each source, so every source is represented once...
+  - {ref: s_webform, table: leads, row: {contact_id: "@the_contact", source: webform}}
+  - {ref: s_referral, table: leads, row: {contact_id: "@the_contact", source: referral}}
+  - {ref: s_event, table: leads, row: {contact_id: "@the_contact", source: event}}
+  - {ref: s_coldcall, table: leads, row: {contact_id: "@the_contact", source: cold_call}}
+  - {ref: s_inbound, table: leads, row: {contact_id: "@the_contact", source: inbound_email}}
+  # ...then n_mode extra copies of the winning source, so it strictly leads
+  - {ref: mode_extra, table: leads, repeat: "{n_mode}",
+     row: {contact_id: "@the_contact", source: "{mode_source}"}}
+
+# ── 3. what a correct solution must have changed: NOTHING (read-only) ──
+effects: {}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {source: "{mode_source}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  What is the most common lead source among {contact_name}'s leads? Answer
+  with the source as source.

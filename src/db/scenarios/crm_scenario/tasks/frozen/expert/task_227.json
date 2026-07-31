@@ -1,0 +1,71 @@
+{
+  "query": "Mark every new lead belonging to Quinn Silva as qualified. Report how many you qualified as n_qualified.",
+  "answer_keys": [
+    "n_qualified"
+  ],
+  "ground_truth": {
+    "n_qualified": 3
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "leads": [
+      {
+        "id": 10,
+        "fields": {
+          "status": "qualified"
+        }
+      },
+      {
+        "id": 31,
+        "fields": {
+          "status": "qualified"
+        }
+      },
+      {
+        "id": 32,
+        "fields": {
+          "status": "qualified"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 3,
+  "task_id": "task_227",
+  "world_seed": 1227,
+  "difficulty": "expert",
+  "template": "qualify_new_leads",
+  "pattern": "iterate_over_set"
+}

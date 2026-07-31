@@ -1,13 +1,22 @@
 {
-  "query": "What's the combined value of all open deals owned by Liam Nakamura and Elif Iversen? Report the total as a plain number for total_value.",
+  "query": "Please push its due date to 2026-06-11 on the overdue follow-up on the Wayne deal. Report the followup_id.",
   "answer_keys": [
-    "total_value"
+    "followup_id"
   ],
   "ground_truth": {
-    "total_value": 83000.0
+    "followup_id": 5
   },
   "expected_added": {},
-  "expected_changed": {},
+  "expected_changed": {
+    "followups": [
+      {
+        "id": 5,
+        "fields": {
+          "due_date": "2026-06-11"
+        }
+      }
+    ]
+  },
   "exact_added_count": {},
   "forbidden": {
     "reps": [
@@ -37,15 +46,14 @@
     ],
     "followups": [
       "added",
-      "changed",
       "removed"
     ]
   },
-  "n_functions": 3,
-  "n_actions": 0,
+  "n_functions": 2,
+  "n_actions": 1,
   "task_id": "task_008",
   "world_seed": 1008,
   "difficulty": "easy",
-  "template": "sum_pipeline_by_reps",
-  "pattern": "parallel_independent"
+  "template": "act_on_a_followup",
+  "pattern": "single_record_act"
 }

@@ -1,0 +1,71 @@
+{
+  "query": "Schedule a follow-up for 2026-06-22 on every open deal owned by Quinn Lee. Report how many you scheduled as n_scheduled.",
+  "answer_keys": [
+    "n_scheduled"
+  ],
+  "ground_truth": {
+    "n_scheduled": 4
+  },
+  "expected_added": {
+    "followups": [
+      {
+        "deal_id": 1,
+        "due_date": "2026-06-22"
+      },
+      {
+        "deal_id": 21,
+        "due_date": "2026-06-22"
+      },
+      {
+        "deal_id": 39,
+        "due_date": "2026-06-22"
+      },
+      {
+        "deal_id": 38,
+        "due_date": "2026-06-22"
+      }
+    ]
+  },
+  "expected_changed": {},
+  "exact_added_count": {
+    "followups": 4
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 5,
+  "n_actions": 4,
+  "task_id": "task_195",
+  "world_seed": 1195,
+  "difficulty": "expert",
+  "template": "schedule_followup_on_each_open_deal",
+  "pattern": "iterate_over_set"
+}

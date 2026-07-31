@@ -1,0 +1,61 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: schedule_followup_on_each_open_deal   (expert tier)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "Schedule a follow-up for 2026-06-22 on every open deal owned by Grace
+#    Silva. Report how many you scheduled as n_scheduled."
+#
+# WHAT IT TESTS:
+#   Iteration over a group with a CREATE per item, carrying a fixed date. The
+#   model must find all of the rep's open deals and schedule one follow-up on
+#   each. Distinct from log_note_on_each_open_deal in the tool used and the
+#   date argument. Closed deals must get nothing.
+#
+# HOW IT'S MADE VALID:
+#   The group size is DECIDED first (n_deals) and exactly that many OPEN deals
+#   are planted under a reserved rep. The rep's closed deals are clutter that
+#   must NOT get a follow-up. The due date is quoted verbatim in the query.
+#   Background deals never belong to the reserved rep, so the group is closed.
+# ──────────────────────────────────────────────────────────────────────
+name: schedule_followup_on_each_open_deal
+pattern: iterate_over_set
+answer_keys: [n_scheduled]
+n_functions: "1 + n_deals"   # find the open deals + one schedule per deal
+n_actions: "{n_deals}"
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  n_deals: {choice: [2, 3, 4]}
+  n_clutter: {randint: [1, 2]}
+  due_date: {sim_date_offset: 21}
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  # the group that must each get a follow-up: the rep's open deals
+  - {ref: open_leads, table: leads, repeat: "{n_deals}", row: {contact_id: "@the_contact"}}
+  - {ref: open_deals, table: deals, repeat: "{n_deals}",
+     row: {lead_id: "@open_leads", rep_id: "@the_rep",
+           stage: {choice: [prospecting, qualification, proposal, negotiation, closing]}}}
+  # clutter: closed deals that must NOT get a follow-up
+  - {ref: clutter_leads, table: leads, repeat: "{n_clutter}", row: {contact_id: "@the_contact"}}
+  - {ref: clutter_deals, table: deals, repeat: "{n_clutter}",
+     row: {lead_id: "@clutter_leads", rep_id: "@the_rep", stage: {choice: [won, lost]}}}
+
+# ── 3. what a correct solution must have added: a follow-up on each open deal ─
+effects:
+  - for_each: open_deals
+    added:
+      - {table: followups, row: {deal_id: "@item", due_date: "{due_date}"}}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {n_scheduled: "{n_deals}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  Schedule a follow-up for {due_date} on every open deal owned by {rep_name}.
+  Report how many you scheduled as n_scheduled.

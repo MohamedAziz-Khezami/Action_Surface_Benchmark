@@ -1,0 +1,59 @@
+{
+  "query": "Please push its due date to 2026-06-06 on the overdue follow-up on the Vandelay deal. Report the followup_id.",
+  "answer_keys": [
+    "followup_id"
+  ],
+  "ground_truth": {
+    "followup_id": 5
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "followups": [
+      {
+        "id": 5,
+        "fields": {
+          "due_date": "2026-06-06"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "removed"
+    ]
+  },
+  "n_functions": 2,
+  "n_actions": 1,
+  "task_id": "task_051",
+  "world_seed": 1051,
+  "difficulty": "easy",
+  "template": "act_on_a_followup",
+  "pattern": "single_record_act"
+}

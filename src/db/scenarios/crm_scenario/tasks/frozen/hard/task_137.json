@@ -1,0 +1,61 @@
+{
+  "query": "Ugh, the new lead from Priya Khan again. Just set its score to 73, then correct its source to inbound_email, then mark it as qualified so we can move on. lead_id please.",
+  "answer_keys": [
+    "lead_id"
+  ],
+  "ground_truth": {
+    "lead_id": 40
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "leads": [
+      {
+        "id": 40,
+        "fields": {
+          "score": 73,
+          "source": "inbound_email",
+          "status": "qualified"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 3,
+  "task_id": "task_137",
+  "world_seed": 1137,
+  "difficulty": "hard",
+  "template": "act_on_a_lead",
+  "pattern": "single_record_act"
+}

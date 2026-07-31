@@ -1,0 +1,71 @@
+{
+  "query": "Mark every lead belonging to Tara Cole with a score below 30 as unqualified. Report how many you updated as n_updated.",
+  "answer_keys": [
+    "n_updated"
+  ],
+  "ground_truth": {
+    "n_updated": 3
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "leads": [
+      {
+        "id": 18,
+        "fields": {
+          "status": "unqualified"
+        }
+      },
+      {
+        "id": 36,
+        "fields": {
+          "status": "unqualified"
+        }
+      },
+      {
+        "id": 9,
+        "fields": {
+          "status": "unqualified"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 3,
+  "task_id": "task_198",
+  "world_seed": 1198,
+  "difficulty": "expert",
+  "template": "disqualify_low_score_leads",
+  "pattern": "conditional_branch"
+}

@@ -1,0 +1,51 @@
+{
+  "query": "Among Grace Nakamura's deals, which one has the second-highest value? Answer with its id as deal_id.",
+  "answer_keys": [
+    "deal_id"
+  ],
+  "ground_truth": {
+    "deal_id": 1
+  },
+  "expected_added": {},
+  "expected_changed": {},
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 3,
+  "n_actions": 0,
+  "task_id": "task_132",
+  "world_seed": 1132,
+  "difficulty": "hard",
+  "template": "second_highest_value_deal",
+  "pattern": "dependent_chain"
+}

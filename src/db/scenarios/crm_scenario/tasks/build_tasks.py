@@ -27,11 +27,18 @@ def build_all(n_per_tier: int = TASKS_PER_TIER, seed_base: int = SEED_BASE, verb
         for stale in list(out_dir.glob("task_*.json")) + list(out_dir.glob("task_*.sqlite")):
             stale.unlink()
 
-        for _ in range(n_per_tier):
+        # Balanced, deterministic template assignment: every registered
+        # template appears (near-)equally often, so none is left with zero
+        # frozen instances as a tier's template count grows toward n_per_tier.
+        # A plain per-task random.choice() left some templates unsampled once a
+        # tier held enough of them; a shuffled round-robin guarantees coverage.
+        templates = cfg["templates"]
+        assignment = (templates * (n_per_tier // len(templates) + 1))[:n_per_tier]
+        random.Random(f"{tier}:template-assignment:{n_per_tier}").shuffle(assignment)
+
+        for j in range(n_per_tier):
             task_seed = seed_base + idx
-            # template choice gets its own stream so adding a template to a
-            # tier can't shift any task's params/world draws
-            template_name = random.Random(f"{task_seed}:template").choice(cfg["templates"])
+            template_name = assignment[j]
             template = ti.load_template(template_name, tier)
             task_id = f"task_{idx:03d}"
             task = wb.build_task(task_seed, template, out_dir / f"{task_id}.sqlite", menus)

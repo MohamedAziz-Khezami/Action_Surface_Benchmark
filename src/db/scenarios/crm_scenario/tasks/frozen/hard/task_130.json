@@ -1,0 +1,74 @@
+{
+  "query": "Ugh, the qualification deal with Cyberdyne again. Just log a meeting about 'renewal' on it, then move it to the closing stage, then schedule a follow-up for 2026-06-06 with the note 'check budget' so we can move on. deal_id please.",
+  "answer_keys": [
+    "deal_id"
+  ],
+  "ground_truth": {
+    "deal_id": 25
+  },
+  "expected_added": {
+    "activities": [
+      {
+        "deal_id": 25,
+        "type": "meeting",
+        "subject": "renewal"
+      }
+    ],
+    "followups": [
+      {
+        "deal_id": 25,
+        "due_date": "2026-06-06"
+      }
+    ]
+  },
+  "expected_changed": {
+    "deals": [
+      {
+        "id": 25,
+        "fields": {
+          "stage": "closing"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {
+    "activities": 1,
+    "followups": 1
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "removed"
+    ],
+    "activities": [
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 3,
+  "task_id": "task_130",
+  "world_seed": 1130,
+  "difficulty": "hard",
+  "template": "act_on_a_deal",
+  "pattern": "single_record_act"
+}

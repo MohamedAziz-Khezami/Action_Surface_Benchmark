@@ -1,0 +1,77 @@
+{
+  "query": "Push every overdue follow-up on Iris Larsen's deals forward by 7 days. Report how many you rescheduled as n_rescheduled.",
+  "answer_keys": [
+    "n_rescheduled"
+  ],
+  "ground_truth": {
+    "n_rescheduled": 4
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "followups": [
+      {
+        "id": 16,
+        "fields": {
+          "due_date": "2026-05-25"
+        }
+      },
+      {
+        "id": 15,
+        "fields": {
+          "due_date": "2026-05-20"
+        }
+      },
+      {
+        "id": 7,
+        "fields": {
+          "due_date": "2026-05-15"
+        }
+      },
+      {
+        "id": 17,
+        "fields": {
+          "due_date": "2026-05-22"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "removed"
+    ]
+  },
+  "n_functions": 5,
+  "n_actions": 4,
+  "task_id": "task_204",
+  "world_seed": 1204,
+  "difficulty": "expert",
+  "template": "reschedule_overdue_followups",
+  "pattern": "iterate_over_set"
+}

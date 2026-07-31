@@ -1,0 +1,60 @@
+{
+  "query": "Find the contact named Sam Moreau at Acme. Look up their most recent lead. Under that lead, find the deal in the negotiation stage. Then log a email about 'renewal' on it. Report deal_id.",
+  "answer_keys": [
+    "deal_id"
+  ],
+  "ground_truth": {
+    "deal_id": 8
+  },
+  "expected_added": {
+    "activities": [
+      {
+        "deal_id": 8,
+        "type": "email",
+        "subject": "renewal"
+      }
+    ]
+  },
+  "expected_changed": {},
+  "exact_added_count": {
+    "activities": 1
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 1,
+  "task_id": "task_188",
+  "world_seed": 1188,
+  "difficulty": "expert",
+  "template": "find_deal_via_chain",
+  "pattern": "dependent_chain"
+}

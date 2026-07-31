@@ -223,6 +223,178 @@ def check_closed_sets(task: dict, world: Path, tmp: Path) -> str | None:
                 "JOIN reps r ON d.rep_id=r.id WHERE r.name=?", (rep,)).fetchall()
             if any(abs((date.fromisoformat(x["due_date"]) - cd).days) < 2 for x in dues):
                 return f"a follow-up is within 1 day of the cutoff {cutoff} (ambiguous)"
+        elif t == "open_deals_without_followups":
+            rep = task["query"].replace("\n", " ").split("How many of ")[1].split("'s open")[0]
+            if _count(conn, "SELECT COUNT(*) FROM reps WHERE name=?", rep) != 1:
+                return f"lookup rep name {rep!r} is not unique"
+            n = _count(conn, "SELECT COUNT(*) FROM deals d JOIN reps r ON d.rep_id=r.id "
+                              "WHERE r.name=? AND d.stage NOT IN ('won','lost') AND NOT EXISTS "
+                              "(SELECT 1 FROM followups f WHERE f.deal_id=d.id)", rep)
+            if n != gt["n_bare"]:
+                return f"rep has {n} open deals without follow-ups, ground truth says {gt['n_bare']}"
+        elif t == "schedule_followup_on_each_open_deal":
+            rep = task["query"].replace("\n", " ").split("owned by ")[1].split(".")[0].strip()
+            if _count(conn, "SELECT COUNT(*) FROM reps WHERE name=?", rep) != 1:
+                return f"iterative rep name {rep!r} is not unique"
+            n = _count(conn, "SELECT COUNT(*) FROM deals d JOIN reps r ON d.rep_id=r.id "
+                              "WHERE r.name=? AND d.stage NOT IN ('won','lost')", rep)
+            if n != gt["n_scheduled"]:
+                return f"rep owns {n} open deals, ground truth says {gt['n_scheduled']}"
+        elif t == "second_highest_value_deal":
+            contact = task["query"].replace("\n", " ").split("Among ")[1].split("'s deals")[0]
+            if _count(conn, "SELECT COUNT(*) FROM contacts WHERE name=?", contact) != 1:
+                return f"lookup contact name {contact!r} is not unique"
+            rows = conn.execute(
+                "SELECT d.id, d.value FROM deals d JOIN leads l ON d.lead_id=l.id "
+                "JOIN contacts c ON l.contact_id=c.id WHERE c.name=? ORDER BY d.value DESC",
+                (contact,)).fetchall()
+            if len(rows) < 3:
+                return f"only {len(rows)} deals for the contact, need >= 3 to rank a runner-up"
+            if rows[1]["id"] != gt["deal_id"]:
+                return f"second-highest deal is id={rows[1]['id']}, ground truth says {gt['deal_id']}"
+            # clear gaps both sides of the runner-up: below the winner, above the rest
+            if rows[0]["value"] < 1.25 * rows[1]["value"]:
+                return f"near-tie at top: winner {rows[0]['value']} within 25% of runner-up {rows[1]['value']}"
+            if rows[1]["value"] < 1.25 * rows[2]["value"]:
+                return f"near-tie below: runner-up {rows[1]['value']} within 25% of third {rows[2]['value']}"
+        elif t == "total_pipeline_for_company":
+            company = task["query"].replace("\n", " ").split("open deals at ")[1].split("?")[0]
+            n_contacts = _count(conn, "SELECT COUNT(*) FROM contacts WHERE company=?", company)
+            if n_contacts < 2:
+                return f"company {company!r} has {n_contacts} contacts, expected the planted 2+"
+            total = conn.execute(
+                "SELECT COALESCE(SUM(d.value),0) FROM deals d JOIN leads l ON d.lead_id=l.id "
+                "JOIN contacts c ON l.contact_id=c.id WHERE c.company=? "
+                "AND d.stage NOT IN ('won','lost')", (company,)).fetchone()[0]
+            if total != gt["total_value"]:
+                return f"company open pipeline sums to {total}, ground truth says {gt['total_value']}"
+        elif t == "most_common_lead_source":
+            contact = task["query"].replace("\n", " ").split("among ")[1].split("'s leads")[0]
+            if _count(conn, "SELECT COUNT(*) FROM contacts WHERE name=?", contact) != 1:
+                return f"lookup contact name {contact!r} is not unique"
+            rows = conn.execute(
+                "SELECT l.source, COUNT(*) n FROM leads l JOIN contacts c ON l.contact_id=c.id "
+                "WHERE c.name=? GROUP BY l.source ORDER BY n DESC", (contact,)).fetchall()
+            if rows[0]["source"] != gt["source"]:
+                return f"mode source is {rows[0]['source']!r}, ground truth says {gt['source']!r}"
+            if len(rows) > 1 and rows[0]["n"] == rows[1]["n"]:
+                return f"mode is a tie: {rows[0]['source']} and {rows[1]['source']} both {rows[0]['n']}"
+        elif t == "disqualify_low_score_leads":
+            contact = task["query"].replace("\n", " ").split("belonging to ")[1].split(" with")[0]
+            if _count(conn, "SELECT COUNT(*) FROM contacts WHERE name=?", contact) != 1:
+                return f"iterative contact name {contact!r} is not unique"
+            rows = conn.execute(
+                "SELECT l.score FROM leads l JOIN contacts c ON l.contact_id=c.id WHERE c.name=?",
+                (contact,)).fetchall()
+            low = sum(1 for x in rows if x["score"] < 30)
+            high = len(rows) - low
+            if low != gt["n_updated"]:
+                return f"{low} leads below 30, ground truth says {gt['n_updated']}"
+            if low == 0 or high == 0:
+                return f"conditional branches not both represented (low={low}, high={high})"
+            for x in rows:
+                if abs(x["score"] - 30) < 5:
+                    return f"near-tie: lead score={x['score']} within 5 of cutoff 30"
+        elif t == "count_contacts_without_leads":
+            rep = task["query"].replace("\n", " ").split("How many of ")[1].split("'s contacts")[0]
+            if _count(conn, "SELECT COUNT(*) FROM reps WHERE name=?", rep) != 1:
+                return f"lookup rep name {rep!r} is not unique"
+            n = _count(conn, "SELECT COUNT(*) FROM contacts c JOIN reps r ON c.rep_id=r.id "
+                              "WHERE r.name=? AND NOT EXISTS "
+                              "(SELECT 1 FROM leads l WHERE l.contact_id=c.id)", rep)
+            if n != gt["n_orphan"]:
+                return f"rep has {n} lead-less contacts, ground truth says {gt['n_orphan']}"
+        elif t == "followup_on_top_deal":
+            contact = task["query"].replace("\n", " ").split(" on ")[1].split("'s highest")[0]
+            if _count(conn, "SELECT COUNT(*) FROM contacts WHERE name=?", contact) != 1:
+                return f"lookup contact name {contact!r} is not unique"
+            rows = conn.execute(
+                "SELECT d.id, d.value FROM deals d JOIN leads l ON d.lead_id=l.id "
+                "JOIN contacts c ON l.contact_id=c.id WHERE c.name=? ORDER BY d.value DESC",
+                (contact,)).fetchall()
+            if rows[0]["id"] != gt["deal_id"]:
+                return f"highest-value deal is id={rows[0]['id']}, ground truth says {gt['deal_id']}"
+            if len(rows) > 1 and rows[0]["value"] < 1.3 * rows[1]["value"]:
+                return (f"near-tie: winner value={rows[0]['value']} within 30% of "
+                        f"runner-up {rows[1]['value']}")
+        elif t == "increment_lead_scores":
+            contact = task["query"].replace("\n", " ").split("belonging to ")[1].split(".")[0].strip()
+            if _count(conn, "SELECT COUNT(*) FROM contacts WHERE name=?", contact) != 1:
+                return f"iterative contact name {contact!r} is not unique"
+            n = _count(conn, "SELECT COUNT(*) FROM leads l JOIN contacts c ON l.contact_id=c.id "
+                              "WHERE c.name=?", contact)
+            if n != gt["n_updated"]:
+                return f"contact has {n} leads, ground truth says {gt['n_updated']}"
+            # +10 must stay within the 0..100 score range for every lead
+            over = _count(conn, "SELECT COUNT(*) FROM leads l JOIN contacts c ON l.contact_id=c.id "
+                                 "WHERE c.name=? AND l.score > 90", contact)
+            if over:
+                return f"{over} lead(s) have score > 90; +10 would exceed the 0..100 range"
+        elif t == "count_overdue_followups":
+            rep = task["query"].replace("\n", " ").split("How many of ")[1].split("'s follow")[0]
+            if _count(conn, "SELECT COUNT(*) FROM reps WHERE name=?", rep) != 1:
+                return f"lookup rep name {rep!r} is not unique"
+            n = _count(conn, "SELECT COUNT(*) FROM followups f JOIN deals d ON f.deal_id=d.id "
+                              "JOIN reps r ON d.rep_id=r.id WHERE r.name=? AND f.status='open' "
+                              "AND f.due_date < ?", rep, SIM_TODAY)
+            if n != gt["n_overdue"]:
+                return f"rep has {n} overdue follow-ups, ground truth says {gt['n_overdue']}"
+        elif t == "reschedule_overdue_followups":
+            rep = task["query"].replace("\n", " ").split("follow-up on ")[1].split("'s deals")[0]
+            if _count(conn, "SELECT COUNT(*) FROM reps WHERE name=?", rep) != 1:
+                return f"iterative rep name {rep!r} is not unique"
+            n = _count(conn, "SELECT COUNT(*) FROM followups f JOIN deals d ON f.deal_id=d.id "
+                              "JOIN reps r ON d.rep_id=r.id WHERE r.name=? AND f.status='open' "
+                              "AND f.due_date < ?", rep, SIM_TODAY)
+            if n != gt["n_rescheduled"]:
+                return f"rep has {n} overdue follow-ups, ground truth says {gt['n_rescheduled']}"
+        elif t == "close_won_high_value_deals":
+            q = task["query"].replace("\n", " ")
+            rep = q.split("owned by ")[1].split(" that")[0]
+            threshold = float(q.split("$")[1].split(" ")[0].rstrip(",.").replace(",", ""))
+            if _count(conn, "SELECT COUNT(*) FROM reps WHERE name=?", rep) != 1:
+                return f"iterative rep name {rep!r} is not unique"
+            rows = conn.execute(
+                "SELECT d.value FROM deals d JOIN reps r ON d.rep_id=r.id "
+                "WHERE r.name=? AND d.stage='closing'", (rep,)).fetchall()
+            over = sum(1 for x in rows if x["value"] > threshold)
+            under = len(rows) - over
+            if over != gt["n_won"]:
+                return f"{over} closing deals over ${threshold}, ground truth says {gt['n_won']}"
+            if over == 0 or under == 0:
+                return f"conditional branches not both represented (over={over}, under={under})"
+            for x in rows:
+                if abs(x["value"] - threshold) < 0.2 * threshold:
+                    return f"near-tie: deal value={x['value']} within 20% of threshold {threshold}"
+        elif t == "count_calls_for_rep":
+            rep = task["query"].replace("\n", " ").split("logged on ")[1].split("'s deals")[0]
+            if _count(conn, "SELECT COUNT(*) FROM reps WHERE name=?", rep) != 1:
+                return f"lookup rep name {rep!r} is not unique"
+            n = _count(conn, "SELECT COUNT(*) FROM activities a JOIN deals d ON a.deal_id=d.id "
+                              "JOIN reps r ON d.rep_id=r.id WHERE r.name=? AND a.type='call'", rep)
+            if n != gt["n_calls"]:
+                return f"rep has {n} call activities, ground truth says {gt['n_calls']}"
+        elif t == "qualify_new_leads":
+            contact = task["query"].replace("\n", " ").split("belonging to ")[1].split(" as qualified")[0]
+            if _count(conn, "SELECT COUNT(*) FROM contacts WHERE name=?", contact) != 1:
+                return f"lookup contact name {contact!r} is not unique"
+            n = _count(conn, "SELECT COUNT(*) FROM leads l JOIN contacts c ON l.contact_id=c.id "
+                              "WHERE c.name=? AND l.status='new'", contact)
+            if n != gt["n_qualified"]:
+                return f"contact has {n} new leads, ground truth says {gt['n_qualified']}"
+        elif t == "highest_value_deal_for_contact":
+            contact = task["query"].replace("\n", " ").split("Among ")[1].split("'s deals")[0]
+            if _count(conn, "SELECT COUNT(*) FROM contacts WHERE name=?", contact) != 1:
+                return f"lookup contact name {contact!r} is not unique"
+            rows = conn.execute(
+                "SELECT d.id, d.value FROM deals d JOIN leads l ON d.lead_id=l.id "
+                "JOIN contacts c ON l.contact_id=c.id WHERE c.name=? ORDER BY d.value DESC",
+                (contact,)).fetchall()
+            if rows[0]["id"] != gt["deal_id"]:
+                return f"highest-value deal is id={rows[0]['id']}, ground truth says {gt['deal_id']}"
+            if len(rows) > 1 and rows[0]["value"] < 1.3 * rows[1]["value"]:
+                return (f"near-tie: winner value={rows[0]['value']} within 30% of "
+                        f"runner-up {rows[1]['value']}")
         elif t == "reassign_contacts":
             # "...owned by {from} to {to}. Report..." — both rep names must be
             # unique (so "owned by X" and "to Y" each resolve to one rep), and

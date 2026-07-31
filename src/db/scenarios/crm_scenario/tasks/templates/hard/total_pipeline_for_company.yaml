@@ -1,0 +1,75 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: total_pipeline_for_company   (hard tier — read-only)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "What is the total value of all open deals at Initech? Report the total
+#    as total_value."
+#
+# WHAT IT TESTS:
+#   A company-level aggregation across MULTIPLE contacts: company -> contacts
+#   -> leads -> deals -> filter open -> sum. No tool returns "a company's
+#   deals", so the model must find every contact at the company, walk each
+#   one's leads and deals, keep only the open ones, and total their value.
+#
+# HOW IT'S MADE VALID:
+#   The open-deal values are DECIDED first and the total is their sum. They
+#   are spread across two contacts at the reserved company; each contact also
+#   owns a closed deal (excluded). The company name is reserved, so no
+#   background contact is ever at it — the company's deal set is closed.
+# ──────────────────────────────────────────────────────────────────────
+name: total_pipeline_for_company
+pattern: parallel_independent
+answer_keys: [total_value]
+n_functions: 4      # find the company's contacts + walk leads/deals + sum
+n_actions: 0
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_a_name: {draw: person_name}
+  contact_b_name: {draw: person_name}
+  company: {draw: company}
+  value_a1: {value_between: [5000, 60000]}
+  value_a2: {value_between: [5000, 60000]}
+  value_b1: {value_between: [5000, 60000]}
+  total_value: {expr: "value_a1 + value_a2 + value_b1"}
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  # contact A at the company: two open deals + one closed
+  - {ref: contact_a, table: contacts, row: {name: "{contact_a_name}", company: "{company}"}}
+  - {ref: lead_a1, table: leads, row: {contact_id: "@contact_a"}}
+  - {ref: deal_a1, table: deals,
+     row: {lead_id: "@lead_a1", rep_id: "@the_rep",
+           stage: {choice: [prospecting, qualification, proposal, negotiation, closing]},
+           value: "{value_a1}"}}
+  - {ref: lead_a2, table: leads, row: {contact_id: "@contact_a"}}
+  - {ref: deal_a2, table: deals,
+     row: {lead_id: "@lead_a2", rep_id: "@the_rep",
+           stage: {choice: [prospecting, qualification, proposal, negotiation, closing]},
+           value: "{value_a2}"}}
+  - {ref: lead_a_closed, table: leads, row: {contact_id: "@contact_a"}}
+  - {ref: deal_a_closed, table: deals,
+     row: {lead_id: "@lead_a_closed", rep_id: "@the_rep", stage: {choice: [won, lost]}}}
+  # contact B at the same company: one open deal + one closed
+  - {ref: contact_b, table: contacts, row: {name: "{contact_b_name}", company: "{company}"}}
+  - {ref: lead_b1, table: leads, row: {contact_id: "@contact_b"}}
+  - {ref: deal_b1, table: deals,
+     row: {lead_id: "@lead_b1", rep_id: "@the_rep",
+           stage: {choice: [prospecting, qualification, proposal, negotiation, closing]},
+           value: "{value_b1}"}}
+  - {ref: lead_b_closed, table: leads, row: {contact_id: "@contact_b"}}
+  - {ref: deal_b_closed, table: deals,
+     row: {lead_id: "@lead_b_closed", rep_id: "@the_rep", stage: {choice: [won, lost]}}}
+
+# ── 3. what a correct solution must have changed: NOTHING (read-only) ──
+effects: {}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {total_value: "{total_value}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  What is the total value of all open deals at {company}? Report the total as
+  total_value.

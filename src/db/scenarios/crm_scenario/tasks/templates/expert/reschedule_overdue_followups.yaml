@@ -1,0 +1,63 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: reschedule_overdue_followups   (expert tier)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "Push every overdue follow-up on Grace Silva's deals forward by 7 days.
+#    Report how many you rescheduled as n_rescheduled."
+#
+# WHAT IT TESTS:
+#   Iteration over a filtered group with a PER-ITEM COMPUTED value: each
+#   overdue follow-up's new due date depends on its own current due date
+#   (old + 7 days), so the model cannot set one shared value — it must read
+#   each due date and compute its replacement. Open-but-future and already-
+#   done follow-ups must be left untouched.
+#
+# HOW IT'S MADE VALID:
+#   The overdue count is DECIDED first (n_overdue), each planted open with a
+#   past due date; the correct new date for each is computed the same way the
+#   task asks (date_offset(due, 7)). Open future follow-ups and done ones are
+#   clutter that must not move. All belong to the reserved rep's deals.
+# ──────────────────────────────────────────────────────────────────────
+name: reschedule_overdue_followups
+pattern: iterate_over_set
+answer_keys: [n_rescheduled]
+n_functions: "1 + n_overdue"   # find the overdue follow-ups + one update each
+n_actions: "{n_overdue}"
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  n_overdue: {choice: [2, 3, 4]}
+  n_future: {randint: [1, 2]}
+  n_done: {randint: [1, 2]}
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  - {ref: the_lead, table: leads, row: {contact_id: "@the_contact"}}
+  - {ref: the_deal, table: deals, row: {lead_id: "@the_lead", rep_id: "@the_rep"}}
+  # the group that must move: overdue (open, past due) follow-ups
+  - {ref: overdue, table: followups, repeat: "{n_overdue}",
+     row: {deal_id: "@the_deal", due_date: {sim_date_offset: {randint: [-25, -3]}}, status: open}}
+  # clutter that must NOT move
+  - {ref: future, table: followups, repeat: "{n_future}",
+     row: {deal_id: "@the_deal", due_date: {sim_date_offset: {randint: [3, 25]}}, status: open}}
+  - {ref: done, table: followups, repeat: "{n_done}",
+     row: {deal_id: "@the_deal", due_date: {sim_date_offset: {randint: [-25, -3]}}, status: done}}
+
+# ── 3. what a correct solution must have changed: each overdue -> +7 days ─
+effects:
+  - for_each: overdue
+    changed:
+      - {table: followups, id: "@item", fields: {due_date: {expr: "date_offset(item.due_date, 7)"}}}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {n_rescheduled: "{n_overdue}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  Push every overdue follow-up on {rep_name}'s deals forward by 7 days. Report
+  how many you rescheduled as n_rescheduled.

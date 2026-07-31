@@ -1,0 +1,60 @@
+{
+  "query": "The new lead from Sam Lee has gone quiet \u2014 mark it as qualified, then set its score to 90. Report lead_id.",
+  "answer_keys": [
+    "lead_id"
+  ],
+  "ground_truth": {
+    "lead_id": 9
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "leads": [
+      {
+        "id": 9,
+        "fields": {
+          "status": "qualified",
+          "score": 90
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 3,
+  "n_actions": 2,
+  "task_id": "task_064",
+  "world_seed": 1064,
+  "difficulty": "medium",
+  "template": "act_on_a_lead",
+  "pattern": "single_record_act"
+}

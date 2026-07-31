@@ -1,0 +1,60 @@
+{
+  "query": "For the overdue follow-up on the Soylent deal: mark it as done, then push its due date to 2026-06-08. Answer with the followup_id you used.",
+  "answer_keys": [
+    "followup_id"
+  ],
+  "ground_truth": {
+    "followup_id": 12
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "followups": [
+      {
+        "id": 12,
+        "fields": {
+          "status": "done",
+          "due_date": "2026-06-08"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "removed"
+    ]
+  },
+  "n_functions": 3,
+  "n_actions": 2,
+  "task_id": "task_077",
+  "world_seed": 1077,
+  "difficulty": "medium",
+  "template": "act_on_a_followup",
+  "pattern": "single_record_act"
+}

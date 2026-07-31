@@ -1,0 +1,57 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: qualify_new_leads   (expert tier)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "Mark every new lead belonging to Grace Silva as qualified. Report how
+#    many you qualified as n_qualified."
+#
+# WHAT IT TESTS:
+#   Iteration over a filtered group with a per-item update. The model must
+#   find all of one contact's leads whose status is 'new', and set each to
+#   'qualified'. Leads already in another status must be left alone; missing
+#   one, or touching a non-new lead, fails the exact-count check.
+#
+# HOW IT'S MADE VALID:
+#   The group size is DECIDED first (n_new) and exactly that many 'new' leads
+#   are planted under a reserved contact. The contact's other leads sit in
+#   non-new statuses (clutter) and must not be touched. Background leads never
+#   belong to the reserved contact, so the group is closed by construction.
+# ──────────────────────────────────────────────────────────────────────
+name: qualify_new_leads
+pattern: iterate_over_set
+answer_keys: [n_qualified]
+n_functions: "1 + n_new"   # find the contact's new leads + one update each
+n_actions: "{n_new}"
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  n_new: {choice: [2, 3, 4]}
+  n_clutter: {randint: [1, 2]}
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  # the group that must move: the contact's 'new' leads
+  - {ref: new_leads, table: leads, repeat: "{n_new}",
+     row: {contact_id: "@the_contact", status: new}}
+  # clutter: the contact's leads already past 'new' — must stay untouched
+  - {ref: clutter_leads, table: leads, repeat: "{n_clutter}",
+     row: {contact_id: "@the_contact", status: {choice: [unqualified, converted]}}}
+
+# ── 3. what a correct solution must have changed: every new lead -> qualified ─
+effects:
+  - for_each: new_leads
+    changed:
+      - {table: leads, id: "@item", fields: {status: qualified}}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {n_qualified: "{n_new}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  Mark every new lead belonging to {contact_name} as qualified. Report how
+  many you qualified as n_qualified.

@@ -1,0 +1,59 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: highest_value_deal_for_contact   (hard tier — read-only)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "Among Grace Silva's deals, which one has the highest value? Answer with
+#    its id as deal_id."
+#
+# WHAT IT TESTS:
+#   A multi-hop argmax: the model must go contact -> leads -> deals, gather
+#   every deal across all of the contact's leads, and pick the single most
+#   valuable one. There is no tool that returns "a contact's deals" directly
+#   (find_deals filters by lead, not contact), so the deals must be collected
+#   across leads and compared.
+#
+# HOW IT'S MADE VALID:
+#   The winner's value is DECIDED well above the others (a clear margin), so
+#   the maximum is unambiguous. Exactly one high-value deal is planted under
+#   the reserved contact, alongside several lower-value deals. Background
+#   deals never belong to the reserved contact, so the comparison set is
+#   closed. Anchor-uniqueness and margin are re-checked in the audit.
+# ──────────────────────────────────────────────────────────────────────
+name: highest_value_deal_for_contact
+pattern: dependent_chain
+answer_keys: [deal_id]
+n_functions: 3      # find the contact's leads + gather their deals + pick the max
+n_actions: 0
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  winner_value: {value_between: [90000, 140000]}
+  n_others: {choice: [2, 3, 4]}
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  # the winner: one clearly-highest-value deal
+  - {ref: winner_lead, table: leads, row: {contact_id: "@the_contact"}}
+  - {ref: winner_deal, table: deals,
+     row: {lead_id: "@winner_lead", rep_id: "@the_rep", value: "{winner_value}"}}
+  # the others: strictly lower value (ceiling well below winner_value's floor)
+  - {ref: other_leads, table: leads, repeat: "{n_others}", row: {contact_id: "@the_contact"}}
+  - {ref: other_deals, table: deals, repeat: "{n_others}",
+     row: {lead_id: "@other_leads", rep_id: "@the_rep",
+           value: {value_between: [5000, 55000]}}}
+
+# ── 3. what a correct solution must have changed: NOTHING (read-only) ──
+effects: {}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {deal_id: "@winner_deal"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  Among {contact_name}'s deals, which one has the highest value? Answer with
+  its id as deal_id.

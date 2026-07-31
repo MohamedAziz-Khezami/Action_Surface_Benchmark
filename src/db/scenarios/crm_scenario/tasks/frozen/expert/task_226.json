@@ -1,0 +1,71 @@
+{
+  "query": "Mark every lead belonging to Omar Iversen with a score below 30 as unqualified. Report how many you updated as n_updated.",
+  "answer_keys": [
+    "n_updated"
+  ],
+  "ground_truth": {
+    "n_updated": 3
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "leads": [
+      {
+        "id": 30,
+        "fields": {
+          "status": "unqualified"
+        }
+      },
+      {
+        "id": 10,
+        "fields": {
+          "status": "unqualified"
+        }
+      },
+      {
+        "id": 7,
+        "fields": {
+          "status": "unqualified"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 3,
+  "task_id": "task_226",
+  "world_seed": 1226,
+  "difficulty": "expert",
+  "template": "disqualify_low_score_leads",
+  "pattern": "conditional_branch"
+}

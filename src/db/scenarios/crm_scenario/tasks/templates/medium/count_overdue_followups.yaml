@@ -1,0 +1,62 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: count_overdue_followups   (medium tier — read-only)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "How many of Grace Silva's follow-ups are overdue? Report the count as
+#    n_overdue."
+#
+# WHAT IT TESTS:
+#   A count against the SIMULATION CLOCK: "overdue" means status is open and
+#   the due date is before today. get_followups can filter by status but not
+#   by date, so the model must fetch the rep's open follow-ups and compare
+#   each due date to today itself. Open-but-future and already-done follow-
+#   ups must be excluded.
+#
+# HOW IT'S MADE VALID:
+#   The overdue count is DECIDED first (n_overdue). Exactly that many open
+#   follow-ups are planted with due dates safely in the past, alongside open
+#   future follow-ups and already-done ones (both excluded). A clear gap
+#   around today keeps "overdue" unambiguous. All belong to the reserved
+#   rep's deals; background follow-ups never do.
+# ──────────────────────────────────────────────────────────────────────
+name: count_overdue_followups
+pattern: single_query_aggregate
+answer_keys: [n_overdue]
+n_functions: 2      # fetch the rep's follow-ups + filter/count by status+date
+n_actions: 0
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  n_overdue: {randint: [2, 4]}     # open + past due -> counted
+  n_future: {randint: [1, 3]}      # open + future due -> excluded
+  n_done: {randint: [1, 2]}        # already done -> excluded
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  - {ref: the_lead, table: leads, row: {contact_id: "@the_contact"}}
+  - {ref: the_deal, table: deals, row: {lead_id: "@the_lead", rep_id: "@the_rep"}}
+  # overdue: open, due 3..25 days in the past
+  - {ref: overdue, table: followups, repeat: "{n_overdue}",
+     row: {deal_id: "@the_deal", due_date: {sim_date_offset: {randint: [-25, -3]}}, status: open}}
+  # open but not yet due: due 3..25 days in the future -> excluded
+  - {ref: future, table: followups, repeat: "{n_future}",
+     row: {deal_id: "@the_deal", due_date: {sim_date_offset: {randint: [3, 25]}}, status: open}}
+  # already done (any date) -> excluded even if past due
+  - {ref: done, table: followups, repeat: "{n_done}",
+     row: {deal_id: "@the_deal", due_date: {sim_date_offset: {randint: [-25, -3]}}, status: done}}
+
+# ── 3. what a correct solution must have changed: NOTHING (read-only) ──
+effects: {}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {n_overdue: "{n_overdue}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  How many of {rep_name}'s follow-ups are overdue? Report the count as
+  n_overdue.

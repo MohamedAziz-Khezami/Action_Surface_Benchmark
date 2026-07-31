@@ -4,5 +4,6 @@
 TIER_CONFIG = {
     "templates": ["act_on_a_deal", "act_on_a_followup", "act_on_a_lead",
                    "sum_pipeline_with_distractor", "sum_deals_in_stages",
-                   "followups_due_within_window"],
+                   "followups_due_within_window", "count_calls_for_rep",
+                   "count_overdue_followups", "count_contacts_without_leads"],
 }

@@ -1,0 +1,60 @@
+{
+  "query": "Schedule a follow-up for 2026-06-20 with the note 'contract review' on Femi Lee's highest-value deal. Report that deal's id as deal_id.",
+  "answer_keys": [
+    "deal_id"
+  ],
+  "ground_truth": {
+    "deal_id": 32
+  },
+  "expected_added": {
+    "followups": [
+      {
+        "deal_id": 32,
+        "due_date": "2026-06-20",
+        "note": "contract review"
+      }
+    ]
+  },
+  "expected_changed": {},
+  "exact_added_count": {
+    "followups": 1
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 1,
+  "task_id": "task_159",
+  "world_seed": 1159,
+  "difficulty": "hard",
+  "template": "followup_on_top_deal",
+  "pattern": "dependent_chain"
+}

@@ -44,7 +44,11 @@ EXECUTOR_IMAGES = {
 
 # ── task generation (build_tasks.py / crm_db.py / world_builder.py) ──────
 SEED_BASE = 1000
-TASKS_PER_TIER = 30
+# 60 per tier so that, under the balanced round-robin assignment in
+# build_tasks.py, each of a tier's ~8-10 templates lands ~6 instances — enough
+# per template for the per-cell statistics (pass^k etc.) to mean something,
+# rather than 1-2 instances that are really "one task with error bars".
+TASKS_PER_TIER = 60
 TIERS = ("easy", "medium", "hard", "expert")
 
 SIM_TODAY = "2026-06-01"  # frozen simulation clock every frozen task/world uses

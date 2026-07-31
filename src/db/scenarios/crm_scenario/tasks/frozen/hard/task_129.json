@@ -1,0 +1,61 @@
+{
+  "query": "Following up from this morning's pipeline review: the new lead from Grace Okafor came up again. mark it as unqualified, then set its score to 94, then correct its source to referral. Include the lead_id in your reply.",
+  "answer_keys": [
+    "lead_id"
+  ],
+  "ground_truth": {
+    "lead_id": 40
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "leads": [
+      {
+        "id": 40,
+        "fields": {
+          "status": "unqualified",
+          "score": 94,
+          "source": "referral"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 3,
+  "task_id": "task_129",
+  "world_seed": 1129,
+  "difficulty": "hard",
+  "template": "act_on_a_lead",
+  "pattern": "single_record_act"
+}

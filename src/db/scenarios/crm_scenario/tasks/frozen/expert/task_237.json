@@ -1,0 +1,77 @@
+{
+  "query": "Move every prospecting-stage deal owned by Omar Tan to the qualification stage. Tell me how many you updated as n_updated.",
+  "answer_keys": [
+    "n_updated"
+  ],
+  "ground_truth": {
+    "n_updated": 4
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "deals": [
+      {
+        "id": 21,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 30,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 22,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 34,
+        "fields": {
+          "stage": "qualification"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 5,
+  "n_actions": 4,
+  "task_id": "task_237",
+  "world_seed": 1237,
+  "difficulty": "expert",
+  "template": "update_every_matching_deal",
+  "pattern": "iterate_over_set"
+}

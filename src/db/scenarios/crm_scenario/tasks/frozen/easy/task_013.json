@@ -1,22 +1,13 @@
 {
-  "query": "Quick task: for the overdue follow-up on the Acme deal, mark it as done. Answer with followup_id.",
+  "query": "What's the combined value of all open deals owned by Bob Larsen and Femi Okafor? Report the total as a plain number for total_value.",
   "answer_keys": [
-    "followup_id"
+    "total_value"
   ],
   "ground_truth": {
-    "followup_id": 13
+    "total_value": 94000.0
   },
   "expected_added": {},
-  "expected_changed": {
-    "followups": [
-      {
-        "id": 13,
-        "fields": {
-          "status": "done"
-        }
-      }
-    ]
-  },
+  "expected_changed": {},
   "exact_added_count": {},
   "forbidden": {
     "reps": [
@@ -46,14 +37,15 @@
     ],
     "followups": [
       "added",
+      "changed",
       "removed"
     ]
   },
-  "n_functions": 2,
-  "n_actions": 1,
+  "n_functions": 3,
+  "n_actions": 0,
   "task_id": "task_013",
   "world_seed": 1013,
   "difficulty": "easy",
-  "template": "act_on_a_followup",
-  "pattern": "single_record_act"
+  "template": "sum_pipeline_by_reps",
+  "pattern": "parallel_independent"
 }

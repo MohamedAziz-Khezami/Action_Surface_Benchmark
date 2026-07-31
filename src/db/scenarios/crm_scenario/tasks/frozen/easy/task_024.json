@@ -1,23 +1,14 @@
 {
-  "query": "Please schedule a follow-up for 2026-06-04 with the note 'send recap' on the qualification deal with Acme. Report the deal_id.",
+  "query": "What's the combined value of all open deals owned by Bob Tan and Kira Iversen? Report the total as a plain number for total_value.",
   "answer_keys": [
-    "deal_id"
+    "total_value"
   ],
   "ground_truth": {
-    "deal_id": 33
+    "total_value": 130000.0
   },
-  "expected_added": {
-    "followups": [
-      {
-        "deal_id": 33,
-        "due_date": "2026-06-04"
-      }
-    ]
-  },
+  "expected_added": {},
   "expected_changed": {},
-  "exact_added_count": {
-    "followups": 1
-  },
+  "exact_added_count": {},
   "forbidden": {
     "reps": [
       "added",
@@ -45,15 +36,16 @@
       "removed"
     ],
     "followups": [
+      "added",
       "changed",
       "removed"
     ]
   },
-  "n_functions": 2,
-  "n_actions": 1,
+  "n_functions": 3,
+  "n_actions": 0,
   "task_id": "task_024",
   "world_seed": 1024,
   "difficulty": "easy",
-  "template": "act_on_a_deal",
-  "pattern": "single_record_act"
+  "template": "sum_pipeline_by_reps",
+  "pattern": "parallel_independent"
 }

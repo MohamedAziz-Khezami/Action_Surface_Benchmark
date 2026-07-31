@@ -1,0 +1,51 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: count_contacts_without_leads   (medium tier — read-only)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "How many of Grace Silva's contacts have no leads? Report the count as
+#    n_orphan."
+#
+# WHAT IT TESTS:
+#   An ABSENCE check across a group — an anti-join the tool API cannot do in
+#   one call. The model must find the rep's contacts and, for each, check
+#   whether any lead exists, counting only those with none. This is the
+#   inverse of the usual "find the matching rows" pattern: the answer is
+#   about rows that are missing.
+#
+# HOW IT'S MADE VALID:
+#   The orphan count is DECIDED first (n_orphan). Exactly that many contacts
+#   are planted under the reserved rep with no leads, alongside linked
+#   contacts that each own at least one lead (excluded). Background contacts
+#   never belong to the reserved rep, so the rep's contact set is closed.
+# ──────────────────────────────────────────────────────────────────────
+name: count_contacts_without_leads
+pattern: single_query_aggregate
+answer_keys: [n_orphan]
+n_functions: 3      # find the rep's contacts + check each for leads + count
+n_actions: 0
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  n_orphan: {randint: [2, 4]}     # contacts with NO leads -> counted
+  n_linked: {randint: [2, 3]}     # contacts WITH a lead -> excluded
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  # orphan contacts: owned by the rep, no leads
+  - {ref: orphans, table: contacts, repeat: "{n_orphan}", row: {rep_id: "@the_rep"}}
+  # linked contacts: owned by the rep, each with exactly one lead (element-wise)
+  - {ref: linked, table: contacts, repeat: "{n_linked}", row: {rep_id: "@the_rep"}}
+  - {ref: linked_leads, table: leads, repeat: "{n_linked}", row: {contact_id: "@linked"}}
+
+# ── 3. what a correct solution must have changed: NOTHING (read-only) ──
+effects: {}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {n_orphan: "{n_orphan}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  How many of {rep_name}'s contacts have no leads? Report the count as
+  n_orphan.

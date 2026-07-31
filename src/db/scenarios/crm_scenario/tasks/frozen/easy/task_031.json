@@ -1,0 +1,51 @@
+{
+  "query": "How many open deals does Dana Mo currently own? Answer with the count as n_deals.",
+  "answer_keys": [
+    "n_deals"
+  ],
+  "ground_truth": {
+    "n_deals": 4
+  },
+  "expected_added": {},
+  "expected_changed": {},
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 2,
+  "n_actions": 1,
+  "task_id": "task_031",
+  "world_seed": 1031,
+  "difficulty": "easy",
+  "template": "count_open_deals",
+  "pattern": "single_query_aggregate"
+}

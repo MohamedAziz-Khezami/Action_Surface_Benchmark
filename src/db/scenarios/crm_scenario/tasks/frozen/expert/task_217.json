@@ -1,0 +1,59 @@
+{
+  "query": "Find the contact named Grace Haddad at Acme. Look up their most recent lead. Under that lead, find the deal in the negotiation stage. Then schedule a follow-up for 2026-06-08 with the note 'check budget'. Report deal_id.",
+  "answer_keys": [
+    "deal_id"
+  ],
+  "ground_truth": {
+    "deal_id": 25
+  },
+  "expected_added": {
+    "followups": [
+      {
+        "deal_id": 25,
+        "due_date": "2026-06-08"
+      }
+    ]
+  },
+  "expected_changed": {},
+  "exact_added_count": {
+    "followups": 1
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 1,
+  "task_id": "task_217",
+  "world_seed": 1217,
+  "difficulty": "expert",
+  "template": "find_deal_via_chain",
+  "pattern": "dependent_chain"
+}

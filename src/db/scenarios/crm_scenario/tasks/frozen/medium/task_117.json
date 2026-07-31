@@ -1,0 +1,68 @@
+{
+  "query": "Can you handle the proposal deal with Tyrell? log a email about 'renewal' on it, then move it to the negotiation stage. I need the deal_id back.",
+  "answer_keys": [
+    "deal_id"
+  ],
+  "ground_truth": {
+    "deal_id": 35
+  },
+  "expected_added": {
+    "activities": [
+      {
+        "deal_id": 35,
+        "type": "email",
+        "subject": "renewal"
+      }
+    ]
+  },
+  "expected_changed": {
+    "deals": [
+      {
+        "id": 35,
+        "fields": {
+          "stage": "negotiation"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {
+    "activities": 1
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "removed"
+    ],
+    "activities": [
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 3,
+  "n_actions": 2,
+  "task_id": "task_117",
+  "world_seed": 1117,
+  "difficulty": "medium",
+  "template": "act_on_a_deal",
+  "pattern": "single_record_act"
+}

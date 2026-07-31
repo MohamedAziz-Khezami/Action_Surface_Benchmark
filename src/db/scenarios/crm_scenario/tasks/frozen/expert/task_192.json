@@ -1,0 +1,79 @@
+{
+  "query": "For each open follow-up on Iris Nakamura's deals: if it's more than 7 days overdue, log a call with the subject 'escalation call' about it; otherwise push its due date back by 3 days. Report how many you escalated as n_escalated.",
+  "answer_keys": [
+    "n_escalated"
+  ],
+  "ground_truth": {
+    "n_escalated": 2
+  },
+  "expected_added": {
+    "activities": [
+      {
+        "deal_id": 19,
+        "type": "call",
+        "subject": "escalation call"
+      },
+      {
+        "deal_id": 35,
+        "type": "call",
+        "subject": "escalation call"
+      }
+    ]
+  },
+  "expected_changed": {
+    "followups": [
+      {
+        "id": 11,
+        "fields": {
+          "due_date": "2026-05-31"
+        }
+      },
+      {
+        "id": 19,
+        "fields": {
+          "due_date": "2026-05-31"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {
+    "activities": 2
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "removed"
+    ]
+  },
+  "n_functions": 5,
+  "n_actions": 4,
+  "task_id": "task_192",
+  "world_seed": 1192,
+  "difficulty": "expert",
+  "template": "triage_each_followup",
+  "pattern": "iterate_over_set"
+}

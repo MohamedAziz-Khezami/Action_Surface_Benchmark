@@ -1,0 +1,65 @@
+{
+  "query": "Move every prospecting-stage deal owned by Noor Weber to the qualification stage. Tell me how many you updated as n_updated.",
+  "answer_keys": [
+    "n_updated"
+  ],
+  "ground_truth": {
+    "n_updated": 2
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "deals": [
+      {
+        "id": 19,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 31,
+        "fields": {
+          "stage": "qualification"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 3,
+  "n_actions": 2,
+  "task_id": "task_234",
+  "world_seed": 1234,
+  "difficulty": "expert",
+  "template": "update_every_matching_deal",
+  "pattern": "iterate_over_set"
+}

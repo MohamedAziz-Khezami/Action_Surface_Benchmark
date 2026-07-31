@@ -1,13 +1,22 @@
 {
-  "query": "How many open deals does Bob Ruiz currently own? Answer with the count as n_deals.",
+  "query": "Our overdue follow-up on the Tyrell deal needs attention: push its due date to 2026-06-04. Give me the id as followup_id.",
   "answer_keys": [
-    "n_deals"
+    "followup_id"
   ],
   "ground_truth": {
-    "n_deals": 2
+    "followup_id": 6
   },
   "expected_added": {},
-  "expected_changed": {},
+  "expected_changed": {
+    "followups": [
+      {
+        "id": 6,
+        "fields": {
+          "due_date": "2026-06-04"
+        }
+      }
+    ]
+  },
   "exact_added_count": {},
   "forbidden": {
     "reps": [
@@ -37,7 +46,6 @@
     ],
     "followups": [
       "added",
-      "changed",
       "removed"
     ]
   },
@@ -46,6 +54,6 @@
   "task_id": "task_009",
   "world_seed": 1009,
   "difficulty": "easy",
-  "template": "count_open_deals",
-  "pattern": "single_query_aggregate"
+  "template": "act_on_a_followup",
+  "pattern": "single_record_act"
 }

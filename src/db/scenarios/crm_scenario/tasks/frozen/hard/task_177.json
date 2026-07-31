@@ -1,0 +1,70 @@
+{
+  "query": "Log a note with the subject 'status update' on every open deal owned by Sam Novak. Report how many you logged as n_logged.",
+  "answer_keys": [
+    "n_logged"
+  ],
+  "ground_truth": {
+    "n_logged": 3
+  },
+  "expected_added": {
+    "activities": [
+      {
+        "deal_id": 4,
+        "type": "note",
+        "subject": "status update"
+      },
+      {
+        "deal_id": 14,
+        "type": "note",
+        "subject": "status update"
+      },
+      {
+        "deal_id": 18,
+        "type": "note",
+        "subject": "status update"
+      }
+    ]
+  },
+  "expected_changed": {},
+  "exact_added_count": {
+    "activities": 3
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 3,
+  "task_id": "task_177",
+  "world_seed": 1177,
+  "difficulty": "hard",
+  "template": "log_note_on_each_open_deal",
+  "pattern": "iterate_over_set"
+}

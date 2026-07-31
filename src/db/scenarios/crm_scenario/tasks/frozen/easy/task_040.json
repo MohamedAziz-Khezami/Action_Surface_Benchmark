@@ -1,0 +1,59 @@
+{
+  "query": "Please mark it as done on the overdue follow-up on the Hooli deal. Report the followup_id.",
+  "answer_keys": [
+    "followup_id"
+  ],
+  "ground_truth": {
+    "followup_id": 7
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "followups": [
+      {
+        "id": 7,
+        "fields": {
+          "status": "done"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "removed"
+    ]
+  },
+  "n_functions": 2,
+  "n_actions": 1,
+  "task_id": "task_040",
+  "world_seed": 1040,
+  "difficulty": "easy",
+  "template": "act_on_a_followup",
+  "pattern": "single_record_act"
+}

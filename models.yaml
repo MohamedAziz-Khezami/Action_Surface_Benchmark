@@ -74,16 +74,3 @@ models:
     api_key_env: null
     supports_tool_calling: true
 
-  - name: qwen3.5-27b-llamacpp-local
-    backend: openai_compatible
-    model_id: unsloth/Qwen3.5-27B-GGUF:BF16/Qwen3.5-27B-BF16-00001-of-00002.gguf  
-    base_url: http://localhost:8092/v1
-    api_key_env: null
-    supports_tool_calling: true
-
-  - name: qwen3.5-35b-a3b-llamacpp-local
-    backend: openai_compatible
-    model_id: unsloth/Qwen3.5-35B-A3B-GGUF:BF16/Qwen3.5-35B-A3B-BF16-00001-of-00002.gguf 
-    base_url: http://localhost:8093/v1
-    api_key_env: null
-    supports_tool_calling: true

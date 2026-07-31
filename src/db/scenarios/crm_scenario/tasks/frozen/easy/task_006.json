@@ -1,13 +1,22 @@
 {
-  "query": "How many open deals does Sam Lee currently own? Answer with the count as n_deals.",
+  "query": "Our proposal deal with Cyberdyne needs attention: move it to the negotiation stage. Give me the id as deal_id.",
   "answer_keys": [
-    "n_deals"
+    "deal_id"
   ],
   "ground_truth": {
-    "n_deals": 6
+    "deal_id": 17
   },
   "expected_added": {},
-  "expected_changed": {},
+  "expected_changed": {
+    "deals": [
+      {
+        "id": 17,
+        "fields": {
+          "stage": "negotiation"
+        }
+      }
+    ]
+  },
   "exact_added_count": {},
   "forbidden": {
     "reps": [
@@ -27,7 +36,6 @@
     ],
     "deals": [
       "added",
-      "changed",
       "removed"
     ],
     "activities": [
@@ -46,6 +54,6 @@
   "task_id": "task_006",
   "world_seed": 1006,
   "difficulty": "easy",
-  "template": "count_open_deals",
-  "pattern": "single_query_aggregate"
+  "template": "act_on_a_deal",
+  "pattern": "single_record_act"
 }

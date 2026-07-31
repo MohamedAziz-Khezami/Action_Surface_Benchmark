@@ -1,0 +1,53 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: increment_lead_scores   (expert tier)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "Add 10 to the score of every lead belonging to Grace Silva. Report how
+#    many you updated as n_updated."
+#
+# WHAT IT TESTS:
+#   Iteration with a per-item READ-MODIFY-WRITE on a number: each lead's new
+#   score depends on its own current score (old + 10), so the model must read
+#   every score and write back the incremented value — it cannot set one
+#   shared score. All of the contact's leads are in scope.
+#
+# HOW IT'S MADE VALID:
+#   The group size is DECIDED first (n_leads), each planted with a known base
+#   score; the correct new score for each is base + 10. Scores are kept below
+#   90 so +10 never exceeds the 0..100 range. Background leads never belong to
+#   the reserved contact, so the group is closed by construction.
+# ──────────────────────────────────────────────────────────────────────
+name: increment_lead_scores
+pattern: iterate_over_set
+answer_keys: [n_updated]
+n_functions: "1 + n_leads"   # find the contact's leads + one update each
+n_actions: "{n_leads}"
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  n_leads: {choice: [2, 3, 4]}
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  # every lead of this contact gets +10; base scores stay under 90 so +10 fits
+  - {ref: the_leads, table: leads, repeat: "{n_leads}",
+     row: {contact_id: "@the_contact", score: {randint: [10, 85]}}}
+
+# ── 3. what a correct solution must have changed: each score -> score + 10 ─
+effects:
+  - for_each: the_leads
+    changed:
+      - {table: leads, id: "@item", fields: {score: {expr: "item.score + 10"}}}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {n_updated: "{n_leads}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  Add 10 to the score of every lead belonging to {contact_name}. Report how
+  many you updated as n_updated.

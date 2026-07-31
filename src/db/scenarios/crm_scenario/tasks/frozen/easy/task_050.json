@@ -1,0 +1,59 @@
+{
+  "query": "Please move it to the negotiation stage on the prospecting deal with Soylent. Report the deal_id.",
+  "answer_keys": [
+    "deal_id"
+  ],
+  "ground_truth": {
+    "deal_id": 15
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "deals": [
+      {
+        "id": 15,
+        "fields": {
+          "stage": "negotiation"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 2,
+  "n_actions": 1,
+  "task_id": "task_050",
+  "world_seed": 1050,
+  "difficulty": "easy",
+  "template": "act_on_a_deal",
+  "pattern": "single_record_act"
+}

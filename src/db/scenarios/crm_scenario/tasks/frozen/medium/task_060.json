@@ -1,0 +1,51 @@
+{
+  "query": "How many of Priya Tan's follow-ups are due on or before 2026-06-08? Report the count as n_due.",
+  "answer_keys": [
+    "n_due"
+  ],
+  "ground_truth": {
+    "n_due": 4
+  },
+  "expected_added": {},
+  "expected_changed": {},
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 2,
+  "n_actions": 0,
+  "task_id": "task_060",
+  "world_seed": 1060,
+  "difficulty": "medium",
+  "template": "followups_due_within_window",
+  "pattern": "single_query_aggregate"
+}

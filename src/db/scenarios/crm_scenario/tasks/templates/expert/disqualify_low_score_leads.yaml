@@ -1,0 +1,59 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: disqualify_low_score_leads   (expert tier)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "Mark every lead belonging to Grace Silva with a score below 30 as
+#    unqualified. Report how many you updated as n_updated."
+#
+# WHAT IT TESTS:
+#   Iteration over a NUMERICALLY-FILTERED group with a per-item update. The
+#   model must find the contact's leads, keep only those scoring below the
+#   cutoff, and set each to 'unqualified'. Leads at or above the cutoff must
+#   be left alone — so a blanket "unqualify all their leads" is wrong.
+#
+# HOW IT'S MADE VALID:
+#   Both the qualifying count (n_low, below cutoff) and the skip count
+#   (n_high, at/above cutoff) are DECIDED first, each >= 1, so a degenerate
+#   all-one-side task cannot be generated. Scores sit a clear margin either
+#   side of 30 (no near-tie). Low leads start in a status other than
+#   'unqualified' so the update is a real change. Background leads never
+#   belong to the reserved contact.
+# ──────────────────────────────────────────────────────────────────────
+name: disqualify_low_score_leads
+pattern: conditional_branch
+answer_keys: [n_updated]
+n_functions: "1 + n_low"   # find the contact's leads + one update per low-score lead
+n_actions: "{n_low}"
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  n_low: {choice: [2, 3]}       # score < 30 -> set unqualified
+  n_high: {choice: [1, 2]}      # score >= 30 -> left alone
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  # low-score leads: score 5..25 (clear margin below 30), status not yet unqualified
+  - {ref: low_leads, table: leads, repeat: "{n_low}",
+     row: {contact_id: "@the_contact", score: {randint: [5, 25]}, status: {choice: [new, qualified]}}}
+  # high-score leads: score 35..90 -> must be left alone
+  - {ref: high_leads, table: leads, repeat: "{n_high}",
+     row: {contact_id: "@the_contact", score: {randint: [35, 90]}, status: {choice: [new, qualified]}}}
+
+# ── 3. what a correct solution must have changed: only the low-score leads ─
+effects:
+  - for_each: low_leads
+    changed:
+      - {table: leads, id: "@item", fields: {status: unqualified}}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {n_updated: "{n_low}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  Mark every lead belonging to {contact_name} with a score below 30 as
+  unqualified. Report how many you updated as n_updated.

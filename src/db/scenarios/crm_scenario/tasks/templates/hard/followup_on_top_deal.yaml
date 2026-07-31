@@ -1,0 +1,62 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: followup_on_top_deal   (hard tier)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "Schedule a follow-up for 2026-06-20 with the note 'contract review' on
+#    Grace Silva's highest-value deal. Report that deal's id as deal_id."
+#
+# WHAT IT TESTS:
+#   A multi-hop argmax FEEDING a create: the model must go contact -> leads
+#   -> deals, find the single most valuable deal, then schedule a follow-up
+#   on exactly that deal. Acting on the wrong deal fails both the added-row
+#   check (wrong deal_id) and the answer.
+#
+# HOW IT'S MADE VALID:
+#   The winner's value is DECIDED well above the others (clear margin), so the
+#   target deal is unambiguous. Exactly one follow-up must be added, on the
+#   winner. The due date and note are quoted verbatim in the query, so the
+#   model never invents text the verifier checks. Background deals never
+#   belong to the reserved contact.
+# ──────────────────────────────────────────────────────────────────────
+name: followup_on_top_deal
+pattern: dependent_chain
+answer_keys: [deal_id]
+n_functions: 4      # find contact's leads + gather deals + pick max + schedule
+n_actions: 1
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  winner_value: {value_between: [90000, 140000]}
+  n_others: {choice: [2, 3]}
+  due_date: {sim_date_offset: 19}
+  note: {choice: [contract review, final terms, sign-off call, renewal discussion]}
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  # the winner: clearly-highest-value deal
+  - {ref: winner_lead, table: leads, row: {contact_id: "@the_contact"}}
+  - {ref: winner_deal, table: deals,
+     row: {lead_id: "@winner_lead", rep_id: "@the_rep", value: "{winner_value}"}}
+  # the others: strictly lower value
+  - {ref: other_leads, table: leads, repeat: "{n_others}", row: {contact_id: "@the_contact"}}
+  - {ref: other_deals, table: deals, repeat: "{n_others}",
+     row: {lead_id: "@other_leads", rep_id: "@the_rep",
+           value: {value_between: [5000, 55000]}}}
+
+# ── 3. what a correct solution must have added: one follow-up on the winner ─
+effects:
+  - added:
+      - {table: followups, row: {deal_id: "@winner_deal", due_date: "{due_date}", note: "{note}"}}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {deal_id: "@winner_deal"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  Schedule a follow-up for {due_date} with the note '{note}' on {contact_name}'s
+  highest-value deal. Report that deal's id as deal_id.

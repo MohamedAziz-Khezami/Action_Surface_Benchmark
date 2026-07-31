@@ -1,0 +1,61 @@
+{
+  "query": "We're behind on the new lead from Kira Ruiz and the quarter is closing \u2014 mark it as qualified, then set its score to 91, then correct its source to event, and don't touch anything else. Send me the lead_id when done.",
+  "answer_keys": [
+    "lead_id"
+  ],
+  "ground_truth": {
+    "lead_id": 10
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "leads": [
+      {
+        "id": 10,
+        "fields": {
+          "status": "qualified",
+          "score": 91,
+          "source": "event"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 3,
+  "task_id": "task_140",
+  "world_seed": 1140,
+  "difficulty": "hard",
+  "template": "act_on_a_lead",
+  "pattern": "single_record_act"
+}

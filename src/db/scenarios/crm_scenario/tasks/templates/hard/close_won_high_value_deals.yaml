@@ -1,0 +1,70 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: close_won_high_value_deals   (hard tier)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "Mark every closing-stage deal owned by Grace Silva that is worth more
+#    than $50,000 as won. Report how many you closed as n_won."
+#
+# WHAT IT TESTS:
+#   Iteration over a group with a PER-ITEM NUMERIC CONDITION and a mutation.
+#   The model must find the rep's closing-stage deals, keep only those over
+#   the threshold, and set each to 'won'. Closing deals under the threshold,
+#   and non-closing deals, must be left alone — so it is not enough to act on
+#   "all closing deals" or "all high-value deals" separately.
+#
+# HOW IT'S MADE VALID:
+#   BOTH the qualifying count (n_won, over threshold) and the skip count
+#   (n_under, closing but below threshold) are DECIDED first, each >= 1, so a
+#   degenerate all-one-side task cannot be generated. Values sit a clear
+#   margin either side of the threshold (no near-tie). Non-closing clutter
+#   deals keep the rep realistic. Background deals never belong to the rep.
+# ──────────────────────────────────────────────────────────────────────
+name: close_won_high_value_deals
+pattern: conditional_branch
+answer_keys: [n_won]
+n_functions: "1 + n_won"   # find the closing deals + one update per qualifying deal
+n_actions: "{n_won}"
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  threshold: {value_between: [40000, 70000]}
+  n_won: {choice: [2, 3]}       # closing AND over threshold -> set to won
+  n_under: {choice: [1, 2]}     # closing but under threshold -> left alone
+  n_clutter: {randint: [1, 2]}  # non-closing -> left alone
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  # qualifying: closing-stage, value a clear margin ABOVE threshold
+  - {ref: won_leads, table: leads, repeat: "{n_won}", row: {contact_id: "@the_contact"}}
+  - {ref: won_deals, table: deals, repeat: "{n_won}",
+     row: {lead_id: "@won_leads", rep_id: "@the_rep", stage: closing,
+           value: {value_between: ["threshold * 1.3", 160000]}}}
+  # closing but UNDER threshold: must be left alone
+  - {ref: under_leads, table: leads, repeat: "{n_under}", row: {contact_id: "@the_contact"}}
+  - {ref: under_deals, table: deals, repeat: "{n_under}",
+     row: {lead_id: "@under_leads", rep_id: "@the_rep", stage: closing,
+           value: {value_between: [5000, "threshold * 0.7"]}}}
+  # non-closing clutter (any value): must be left alone
+  - {ref: clutter_leads, table: leads, repeat: "{n_clutter}", row: {contact_id: "@the_contact"}}
+  - {ref: clutter_deals, table: deals, repeat: "{n_clutter}",
+     row: {lead_id: "@clutter_leads", rep_id: "@the_rep",
+           stage: {choice: [prospecting, qualification, proposal, negotiation]}}}
+
+# ── 3. what a correct solution must have changed: only the qualifying deals ─
+effects:
+  - for_each: won_deals
+    changed:
+      - {table: deals, id: "@item", fields: {stage: won}}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {n_won: "{n_won}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  Mark every closing-stage deal owned by {rep_name} that is worth more than
+  ${threshold} as won. Report how many you closed as n_won.

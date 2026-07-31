@@ -1,0 +1,60 @@
+# ──────────────────────────────────────────────────────────────────────
+# TASK TYPE: count_calls_for_rep   (medium tier — read-only)
+#
+# WHAT THE MODEL IS ASKED (example):
+#   "How many call activities are logged on Grace Silva's deals? Report the
+#    count as n_calls."
+#
+# WHAT IT TESTS:
+#   A count that spans several deals AND filters by activity type — neither
+#   of which the tool API does in one call: get_activities takes a single
+#   deal (or contact) and returns ALL types. So the model must find the
+#   rep's deals, gather the activities on each, and count only the calls.
+#   Emails/meetings/notes must be excluded.
+#
+# HOW IT'S MADE VALID:
+#   The call count is DECIDED first (n_calls). Exactly that many 'call'
+#   activities are planted on the rep's deals, alongside clutter activities
+#   of other types that must not be counted. Background activities never
+#   touch the reserved rep's deals.
+# ──────────────────────────────────────────────────────────────────────
+name: count_calls_for_rep
+pattern: single_query_aggregate
+answer_keys: [n_calls]
+n_functions: 3      # find the rep's deals + gather activities + count
+n_actions: 0
+
+# ── 1. dice rolls ────────────────────────────────────────────────────────
+params:
+  rep_name: {draw: person_name}
+  contact_name: {draw: person_name}
+  company: {draw: company}
+  n_calls: {randint: [2, 5]}
+  n_other: {randint: [2, 4]}
+
+# ── 2. rows planted into the world ─────────────────────────────────────
+kernel:
+  - {ref: the_rep, table: reps, row: {name: "{rep_name}"}}
+  - {ref: the_contact, table: contacts, row: {name: "{contact_name}", company: "{company}"}}
+  # two deals to spread the activities across
+  - {ref: lead_a, table: leads, row: {contact_id: "@the_contact"}}
+  - {ref: deal_a, table: deals, row: {lead_id: "@lead_a", rep_id: "@the_rep"}}
+  - {ref: lead_b, table: leads, row: {contact_id: "@the_contact"}}
+  - {ref: deal_b, table: deals, row: {lead_id: "@lead_b", rep_id: "@the_rep"}}
+  # the calls to count (on deal_a)
+  - {ref: the_calls, table: activities, repeat: "{n_calls}",
+     row: {deal_id: "@deal_a", type: call}}
+  # clutter: other activity types (on deal_b) that must NOT be counted
+  - {ref: other_acts, table: activities, repeat: "{n_other}",
+     row: {deal_id: "@deal_b", type: {choice: [email, meeting, note]}}}
+
+# ── 3. what a correct solution must have changed: NOTHING (read-only) ──
+effects: {}
+
+# ── 4. the correct answer ──────────────────────────────────────────────
+answer: {n_calls: "{n_calls}"}
+
+# ── 5. the query (fixed form) ──────────────────────────────────────────
+query: >-
+  How many call activities are logged on {rep_name}'s deals? Report the count
+  as n_calls.

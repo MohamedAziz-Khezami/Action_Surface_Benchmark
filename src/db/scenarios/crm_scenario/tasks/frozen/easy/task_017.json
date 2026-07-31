@@ -1,14 +1,24 @@
 {
-  "query": "How many open deals does Hugo Haddad currently own? Answer with the count as n_deals.",
+  "query": "Our prospecting deal with Umbrella needs attention: log a meeting about 'kickoff' on it. Give me the id as deal_id.",
   "answer_keys": [
-    "n_deals"
+    "deal_id"
   ],
   "ground_truth": {
-    "n_deals": 6
+    "deal_id": 25
   },
-  "expected_added": {},
+  "expected_added": {
+    "activities": [
+      {
+        "deal_id": 25,
+        "type": "meeting",
+        "subject": "kickoff"
+      }
+    ]
+  },
   "expected_changed": {},
-  "exact_added_count": {},
+  "exact_added_count": {
+    "activities": 1
+  },
   "forbidden": {
     "reps": [
       "added",
@@ -31,7 +41,6 @@
       "removed"
     ],
     "activities": [
-      "added",
       "changed",
       "removed"
     ],
@@ -46,6 +55,6 @@
   "task_id": "task_017",
   "world_seed": 1017,
   "difficulty": "easy",
-  "template": "count_open_deals",
-  "pattern": "single_query_aggregate"
+  "template": "act_on_a_deal",
+  "pattern": "single_record_act"
 }

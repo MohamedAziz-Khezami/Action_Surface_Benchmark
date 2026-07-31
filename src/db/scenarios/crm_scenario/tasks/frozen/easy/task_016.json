@@ -1,10 +1,10 @@
 {
-  "query": "What's the combined value of all open deals owned by Tara Tan and Sam Cole? Report the total as a plain number for total_value.",
+  "query": "How many open deals does Tara Tan currently own? Answer with the count as n_deals.",
   "answer_keys": [
-    "total_value"
+    "n_deals"
   ],
   "ground_truth": {
-    "total_value": 56500.0
+    "n_deals": 5
   },
   "expected_added": {},
   "expected_changed": {},
@@ -41,11 +41,11 @@
       "removed"
     ]
   },
-  "n_functions": 3,
-  "n_actions": 0,
+  "n_functions": 2,
+  "n_actions": 1,
   "task_id": "task_016",
   "world_seed": 1016,
   "difficulty": "easy",
-  "template": "sum_pipeline_by_reps",
-  "pattern": "parallel_independent"
+  "template": "count_open_deals",
+  "pattern": "single_query_aggregate"
 }

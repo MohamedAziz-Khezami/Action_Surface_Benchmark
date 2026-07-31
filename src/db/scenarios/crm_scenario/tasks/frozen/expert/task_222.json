@@ -1,0 +1,90 @@
+{
+  "query": "For each open follow-up on Alice Moreau's deals: if it's more than 7 days overdue, log a call with the subject 'second reminder' about it; otherwise push its due date back by 3 days. Report how many you escalated as n_escalated.",
+  "answer_keys": [
+    "n_escalated"
+  ],
+  "ground_truth": {
+    "n_escalated": 3
+  },
+  "expected_added": {
+    "activities": [
+      {
+        "deal_id": 11,
+        "type": "call",
+        "subject": "second reminder"
+      },
+      {
+        "deal_id": 6,
+        "type": "call",
+        "subject": "second reminder"
+      },
+      {
+        "deal_id": 3,
+        "type": "call",
+        "subject": "second reminder"
+      }
+    ]
+  },
+  "expected_changed": {
+    "followups": [
+      {
+        "id": 18,
+        "fields": {
+          "due_date": "2026-06-04"
+        }
+      },
+      {
+        "id": 17,
+        "fields": {
+          "due_date": "2026-06-03"
+        }
+      },
+      {
+        "id": 9,
+        "fields": {
+          "due_date": "2026-06-05"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {
+    "activities": 3
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "removed"
+    ]
+  },
+  "n_functions": 7,
+  "n_actions": 6,
+  "task_id": "task_222",
+  "world_seed": 1222,
+  "difficulty": "expert",
+  "template": "triage_each_followup",
+  "pattern": "iterate_over_set"
+}

@@ -1,0 +1,51 @@
+{
+  "query": "What's the combined value of all open deals owned by Priya Diaz and Rosa Cole? Report the total as a plain number for total_value.",
+  "answer_keys": [
+    "total_value"
+  ],
+  "ground_truth": {
+    "total_value": 71000.0
+  },
+  "expected_added": {},
+  "expected_changed": {},
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 3,
+  "n_actions": 0,
+  "task_id": "task_054",
+  "world_seed": 1054,
+  "difficulty": "easy",
+  "template": "sum_pipeline_by_reps",
+  "pattern": "parallel_independent"
+}

@@ -1,22 +1,13 @@
 {
-  "query": "Please move it to the negotiation stage on the proposal deal with Wayne. Report the deal_id.",
+  "query": "What's the combined value of all open deals owned by Liam Diaz and Liam Okafor? Report the total as a plain number for total_value.",
   "answer_keys": [
-    "deal_id"
+    "total_value"
   ],
   "ground_truth": {
-    "deal_id": 14
+    "total_value": 96500.0
   },
   "expected_added": {},
-  "expected_changed": {
-    "deals": [
-      {
-        "id": 14,
-        "fields": {
-          "stage": "negotiation"
-        }
-      }
-    ]
-  },
+  "expected_changed": {},
   "exact_added_count": {},
   "forbidden": {
     "reps": [
@@ -36,6 +27,7 @@
     ],
     "deals": [
       "added",
+      "changed",
       "removed"
     ],
     "activities": [
@@ -49,11 +41,11 @@
       "removed"
     ]
   },
-  "n_functions": 2,
-  "n_actions": 1,
+  "n_functions": 3,
+  "n_actions": 0,
   "task_id": "task_011",
   "world_seed": 1011,
   "difficulty": "easy",
-  "template": "act_on_a_deal",
-  "pattern": "single_record_act"
+  "template": "sum_pipeline_by_reps",
+  "pattern": "parallel_independent"
 }

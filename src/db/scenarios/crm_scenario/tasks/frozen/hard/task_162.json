@@ -1,0 +1,60 @@
+{
+  "query": "Schedule a follow-up for 2026-06-20 with the note 'sign-off call' on Dana Nakamura's highest-value deal. Report that deal's id as deal_id.",
+  "answer_keys": [
+    "deal_id"
+  ],
+  "ground_truth": {
+    "deal_id": 1
+  },
+  "expected_added": {
+    "followups": [
+      {
+        "deal_id": 1,
+        "due_date": "2026-06-20",
+        "note": "sign-off call"
+      }
+    ]
+  },
+  "expected_changed": {},
+  "exact_added_count": {
+    "followups": 1
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 1,
+  "task_id": "task_162",
+  "world_seed": 1162,
+  "difficulty": "hard",
+  "template": "followup_on_top_deal",
+  "pattern": "dependent_chain"
+}

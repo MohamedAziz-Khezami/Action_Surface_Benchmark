@@ -1,0 +1,59 @@
+{
+  "query": "Our prospecting deal with Umbrella needs attention: schedule a follow-up for 2026-06-11 with the note 'confirm terms'. Give me the id as deal_id.",
+  "answer_keys": [
+    "deal_id"
+  ],
+  "ground_truth": {
+    "deal_id": 5
+  },
+  "expected_added": {
+    "followups": [
+      {
+        "deal_id": 5,
+        "due_date": "2026-06-11"
+      }
+    ]
+  },
+  "expected_changed": {},
+  "exact_added_count": {
+    "followups": 1
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 2,
+  "n_actions": 1,
+  "task_id": "task_034",
+  "world_seed": 1034,
+  "difficulty": "easy",
+  "template": "act_on_a_deal",
+  "pattern": "single_record_act"
+}

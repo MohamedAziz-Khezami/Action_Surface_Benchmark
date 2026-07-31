@@ -1,0 +1,67 @@
+{
+  "query": "For the proposal deal with Hooli: move it to the negotiation stage, then schedule a follow-up for 2026-06-08 with the note 'check budget'. Answer with the deal_id you used.",
+  "answer_keys": [
+    "deal_id"
+  ],
+  "ground_truth": {
+    "deal_id": 1
+  },
+  "expected_added": {
+    "followups": [
+      {
+        "deal_id": 1,
+        "due_date": "2026-06-08"
+      }
+    ]
+  },
+  "expected_changed": {
+    "deals": [
+      {
+        "id": 1,
+        "fields": {
+          "stage": "negotiation"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {
+    "followups": 1
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 3,
+  "n_actions": 2,
+  "task_id": "task_112",
+  "world_seed": 1112,
+  "difficulty": "medium",
+  "template": "act_on_a_deal",
+  "pattern": "single_record_act"
+}

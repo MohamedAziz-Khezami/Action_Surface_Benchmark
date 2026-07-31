@@ -1,0 +1,66 @@
+{
+  "query": "For the proposal deal with Cyberdyne: log a meeting about 'kickoff' on it, then schedule a follow-up for 2026-06-08 with the note 'send recap'. Answer with the deal_id you used.",
+  "answer_keys": [
+    "deal_id"
+  ],
+  "ground_truth": {
+    "deal_id": 22
+  },
+  "expected_added": {
+    "activities": [
+      {
+        "deal_id": 22,
+        "type": "meeting",
+        "subject": "kickoff"
+      }
+    ],
+    "followups": [
+      {
+        "deal_id": 22,
+        "due_date": "2026-06-08"
+      }
+    ]
+  },
+  "expected_changed": {},
+  "exact_added_count": {
+    "activities": 1,
+    "followups": 1
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 3,
+  "n_actions": 2,
+  "task_id": "task_108",
+  "world_seed": 1108,
+  "difficulty": "medium",
+  "template": "act_on_a_deal",
+  "pattern": "single_record_act"
+}

@@ -1,0 +1,51 @@
+{
+  "query": "What is the total value of all open deals at Stark? Report the total as total_value.",
+  "answer_keys": [
+    "total_value"
+  ],
+  "ground_truth": {
+    "total_value": 105000.0
+  },
+  "expected_added": {},
+  "expected_changed": {},
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 0,
+  "task_id": "task_134",
+  "world_seed": 1134,
+  "difficulty": "hard",
+  "template": "total_pipeline_for_company",
+  "pattern": "parallel_independent"
+}

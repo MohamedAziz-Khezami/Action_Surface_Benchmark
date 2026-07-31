@@ -1,0 +1,68 @@
+{
+  "query": "For each open follow-up on Liam Weber's deals: if it's more than 7 days overdue, log a call with the subject 'urgent follow-up' about it; otherwise push its due date back by 3 days. Report how many you escalated as n_escalated.",
+  "answer_keys": [
+    "n_escalated"
+  ],
+  "ground_truth": {
+    "n_escalated": 1
+  },
+  "expected_added": {
+    "activities": [
+      {
+        "deal_id": 2,
+        "type": "call",
+        "subject": "urgent follow-up"
+      }
+    ]
+  },
+  "expected_changed": {
+    "followups": [
+      {
+        "id": 10,
+        "fields": {
+          "due_date": "2026-06-05"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {
+    "activities": 1
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "removed"
+    ]
+  },
+  "n_functions": 3,
+  "n_actions": 2,
+  "task_id": "task_180",
+  "world_seed": 1180,
+  "difficulty": "expert",
+  "template": "triage_each_followup",
+  "pattern": "iterate_over_set"
+}

@@ -1,0 +1,73 @@
+{
+  "query": "Ugh, the contact Rosa Khan at Soylent again. Just update their phone number to +1-555-6155, then log a email about 'pricing' with them, then log a note saying 'check budget' for them so we can move on. contact_id please.",
+  "answer_keys": [
+    "contact_id"
+  ],
+  "ground_truth": {
+    "contact_id": 49
+  },
+  "expected_added": {
+    "activities": [
+      {
+        "contact_id": 49,
+        "type": "email",
+        "subject": "pricing"
+      },
+      {
+        "contact_id": 49,
+        "type": "note",
+        "subject": "check budget"
+      }
+    ]
+  },
+  "expected_changed": {
+    "contacts": [
+      {
+        "id": 49,
+        "fields": {
+          "phone": "+1-555-6155"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {
+    "activities": 2
+  },
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 4,
+  "n_actions": 3,
+  "task_id": "task_138",
+  "world_seed": 1138,
+  "difficulty": "hard",
+  "template": "act_on_a_contact",
+  "pattern": "single_record_act"
+}

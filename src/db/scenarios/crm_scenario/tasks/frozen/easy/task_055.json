@@ -1,0 +1,59 @@
+{
+  "query": "Quick task: for the overdue follow-up on the Wonka deal, mark it as done. Answer with followup_id.",
+  "answer_keys": [
+    "followup_id"
+  ],
+  "ground_truth": {
+    "followup_id": 16
+  },
+  "expected_added": {},
+  "expected_changed": {
+    "followups": [
+      {
+        "id": 16,
+        "fields": {
+          "status": "done"
+        }
+      }
+    ]
+  },
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "removed"
+    ]
+  },
+  "n_functions": 2,
+  "n_actions": 1,
+  "task_id": "task_055",
+  "world_seed": 1055,
+  "difficulty": "easy",
+  "template": "act_on_a_followup",
+  "pattern": "single_record_act"
+}

@@ -1,0 +1,51 @@
+{
+  "query": "What is the most common lead source among Rosa Larsen's leads? Answer with the source as source.",
+  "answer_keys": [
+    "source"
+  ],
+  "ground_truth": {
+    "source": "referral"
+  },
+  "expected_added": {},
+  "expected_changed": {},
+  "exact_added_count": {},
+  "forbidden": {
+    "reps": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "contacts": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "leads": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "deals": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "activities": [
+      "added",
+      "changed",
+      "removed"
+    ],
+    "followups": [
+      "added",
+      "changed",
+      "removed"
+    ]
+  },
+  "n_functions": 2,
+  "n_actions": 0,
+  "task_id": "task_148",
+  "world_seed": 1148,
+  "difficulty": "hard",
+  "template": "most_common_lead_source",
+  "pattern": "single_query_aggregate"
+}
