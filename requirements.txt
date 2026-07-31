@@ -1,11 +1,19 @@
-fastapi>=0.139
-uvicorn>=0.50
-fastapi-mcp>=0.4
-requests>=2.34
-flask>=3.1
-pydantic>=2.13
-pytest>=9.1
-docker>=7.1
+# Lower bounds chosen for portability: high enough for the APIs this code uses
+# (Pydantic v2 model_fields / model_json_schema / ConfigDict, FastAPI +
+# TestClient), low enough to install on a machine whose package index lags the
+# very latest. Newer versions still satisfy these.
+#
+# fastapi-mcp is intentionally NOT listed: the benchmark never drives the MCP
+# endpoint (the json_mcp surface calls the plain tool routes directly), and
+# server.py already skips the optional mount when the package is missing or
+# broken. Leaving it out avoids version-skew failures on indexes that carry an
+# incompatible fastapi-mcp / mcp pair.
+fastapi>=0.110
+uvicorn>=0.23
+requests>=2.31
+flask>=3.0
+pydantic>=2.5
+pytest>=8.0
+docker>=7.0
 pyyaml>=6.0
-openai>=1.0
-
+openai>=1.30

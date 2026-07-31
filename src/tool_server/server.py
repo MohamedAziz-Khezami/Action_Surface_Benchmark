@@ -10,7 +10,16 @@ import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from fastapi_mcp import FastApiMCP
+
+# FastApiMCP mounts a real MCP-protocol endpoint on the app, but the benchmark
+# never drives it: the json_mcp surface calls the plain tool routes directly
+# (POST /find_deals, ...). So it is an optional nicety — if the package isn't
+# available (some indexes don't carry it), the tool-server still serves every
+# route the benchmark actually uses.
+try:
+    from fastapi_mcp import FastApiMCP
+except ImportError:  # pragma: no cover - environment-dependent
+    FastApiMCP = None
 
 from src.tool_server import services
 from src.tool_server.envelope import APIResponse
@@ -165,8 +174,16 @@ async def update_followup(args: UpdateFollowupArgs):
     return services.update_followup(_conn, args)
 
 
-mcp = FastApiMCP(app)
-mcp.mount_http()
+if FastApiMCP is not None:
+    # The package may import yet still be unusable — e.g. a fastapi-mcp built
+    # against a different `mcp` version than the one installed, which raises at
+    # construction. Since the benchmark never drives the MCP endpoint, treat any
+    # failure here the same as the package being absent and carry on serving the
+    # real tool routes.
+    try:
+        FastApiMCP(app).mount_http()
+    except Exception as e:  # noqa: BLE001 — optional feature; never block the tool-server
+        logger.warning("skipping optional MCP mount: %s", e)
 
 
 def main() -> None:
