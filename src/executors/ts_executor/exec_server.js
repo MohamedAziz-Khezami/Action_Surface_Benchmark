@@ -11,6 +11,20 @@ const path = require('path');
 const ts = require('typescript');
 const { makeToolsProxy } = require('./tools_client');
 
+// Model code routinely leaves a promise unhandled — e.g. calling an async tool
+// without `await`, which then rejects when the arguments are invalid. Node's
+// default is to crash the process on an unhandled rejection (and on an uncaught
+// exception), which would kill this server and make every later request in the
+// container fail with "connection refused" — turning a recoverable model
+// mistake into an episode-ending infra error that the analysis excludes. Absorb
+// them so one bad code block is contained as a normal failed exec instead.
+process.on('unhandledRejection', (reason) => {
+  console.error('[executor] ignored unhandledRejection:', reason && reason.message ? reason.message : reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('[executor] ignored uncaughtException:', err && err.message ? err.message : err);
+});
+
 const TOOL_SERVER_URL = process.env.TOOL_SERVER_URL || 'http://localhost:8000';
 const { proxy: tools, counter: toolCallCounter } = makeToolsProxy(TOOL_SERVER_URL);
 const sandbox = vm.createContext({ tools, console, JSON, Math, Date });
