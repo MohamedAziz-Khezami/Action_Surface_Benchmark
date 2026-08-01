@@ -27,7 +27,7 @@ models:
 
   - name: gpt-oss-20b-llamacpp-local
     backend: openai_compatible
-    model_id: ggml-org/gpt-oss-20b-GGUF:gpt-oss-20b-mxfp4.gguf
+    model_id: ggml-org/gpt-oss-20b-GGUF:gpt-oss-20b-MXFP4.gguf
     base_url: http://localhost:8085/v1
     api_key_env: null
     supports_tool_calling: true

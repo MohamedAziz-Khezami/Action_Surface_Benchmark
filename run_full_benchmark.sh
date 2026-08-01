@@ -26,6 +26,41 @@ READY_TIMEOUT_S="${READY_TIMEOUT_S:-3600}"   # 1 hour ceiling per model — cove
 READY_POLL_INTERVAL_S=5
 SHUTDOWN_TIMEOUT_S=30
 
+# ── context window ───────────────────────────────────────────────────────
+# llama-server defaults to a small total context SPLIT ACROSS PARALLEL SLOTS
+# (n_ctx_slot = 4096 with the default 4 slots). That is far too small here:
+# the system prompt + tool catalog alone is ~12k tokens for the code surfaces
+# and ~17k for TypeScript, so every request 400s with "exceeds the available
+# context size" before the model does any work — and when a request squeaks in
+# but generation runs out mid-tool-call, the harness gets truncated JSON
+# ("Unterminated string ...") instead of a clean error.
+#
+# So: pin an explicit context and give it to ONE slot. The harness issues one
+# request at a time, so extra slots buy nothing and only divide the window.
+CTX_SIZE="${CTX_SIZE:-32768}"   # covers the heaviest prompt + a full 20-turn conversation
+PARALLEL_SLOTS=1
+
+# Every model gets the SAME context. That is deliberate: this benchmark holds
+# everything but the action surface constant, so giving one model a different
+# window than the others would introduce exactly the kind of confound the
+# design exists to avoid.
+#
+# Sizing (target box: 4x RTX 5090 = 128GB VRAM): the whole fleet fits at its
+# pinned precision with a 32k window — the heaviest, Qwen2.5-72B-Q8, needs
+# ~76GB of weights plus ~10GB of KV cache, leaving ample headroom. On a smaller
+# box, lower it globally rather than per-model, e.g.
+#   CTX_SIZE=16384 ./run_full_benchmark.sh
+# so every model still runs under identical conditions.
+#
+# A case statement (rather than an associative array) is used below so a
+# per-model exception, if one ever becomes unavoidable, still works on bash 3.2
+# — macOS's system bash, which has no `declare -A`.
+ctx_for_model() {
+    case "$1" in
+        *) echo "$CTX_SIZE" ;;
+    esac
+}
+
 CURRENT_PID=""
 
 # Ensure a still-running server gets killed even if the script is
@@ -74,18 +109,23 @@ for line in "${MODEL_LINES[@]}"; do
     mkdir -p "$OUT_DIR"
     SERVER_LOG="${OUT_DIR}/llama-server.log"
 
+    MODEL_CTX="$(ctx_for_model "$NAME")"
+
     echo "════════════════════════════════════════════════════════════════"
     echo "[$NAME] starting llama-server on port ${PORT}"
     echo "[$NAME]   repo: ${HF_REPO}"
     [[ -n "$HF_FILE" ]] && echo "[$NAME]   file: ${HF_FILE}"
+    echo "[$NAME]   ctx:  ${MODEL_CTX} tokens across ${PARALLEL_SLOTS} slot(s)"
     echo "[$NAME]   log:  ${SERVER_LOG}"
 
     if [[ -n "$HF_FILE" ]]; then
         nohup llama-server --hf-repo "$HF_REPO" --hf-file "$HF_FILE" \
-            --port "$PORT" --jinja -ngl 999 > "$SERVER_LOG" 2>&1 &
+            --port "$PORT" --jinja -ngl 999 \
+            -c "$MODEL_CTX" -np "$PARALLEL_SLOTS" > "$SERVER_LOG" 2>&1 &
     else
         nohup llama-server --hf-repo "$HF_REPO" \
-            --port "$PORT" --jinja -ngl 999 > "$SERVER_LOG" 2>&1 &
+            --port "$PORT" --jinja -ngl 999 \
+            -c "$MODEL_CTX" -np "$PARALLEL_SLOTS" > "$SERVER_LOG" 2>&1 &
     fi
     CURRENT_PID=$!
     echo "[$NAME] pid: ${CURRENT_PID}"
