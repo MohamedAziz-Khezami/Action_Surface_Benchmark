@@ -30,6 +30,31 @@ RETRY_DELAYS_S = (0.5, 1.0, 2.0)
 EXEC_HTTP_TIMEOUT_S = 60        # code-mode execute() call to the executor container
 TOOL_CALL_HTTP_TIMEOUT_S = 30   # json_mcp direct tool-server call
 
+# Ceiling on ONE model turn. The OpenAI SDK defaults to 600s, which is far too
+# generous here: a local model that stops emitting (no stop token, a decode
+# loop) would burn 10 minutes per turn, and with a 20-turn budget that is over
+# three hours for a single episode — enough to stall an unattended fleet run.
+# A legitimate turn, even for the 72B at Q8 with a long prompt, lands well
+# under two minutes, so this leaves ample headroom while capping a hang. When
+# it fires the harness records a model_api_error and moves on, which is the
+# honest outcome: the model failed to answer in reasonable time.
+MODEL_REQUEST_TIMEOUT_S = 300
+
+# Consecutive model-API failures after which a model is abandoned for the rest
+# of the run. A per-turn timeout caps ONE stuck request, but does nothing about
+# a server that has stopped serving entirely: the harness will happily feed a
+# dead llama-server every remaining episode, each costing a full timeout. That
+# happened — a CUDA context died while the process stayed up answering HTTP,
+# and the run spent 37 hours producing nothing but timeouts.
+#
+# A model that is genuinely working never fails this many times in a row, so
+# the threshold trades a bounded detection cost (5 x MODEL_REQUEST_TIMEOUT_S,
+# ~25 minutes) for the certainty that a wedged server cannot consume the rest
+# of the run. Remaining episodes for that model are left unwritten rather than
+# recorded as failures — they were never attempted, and scoring them would
+# understate the model.
+CONSECUTIVE_API_ERROR_LIMIT = 5
+
 # ── Docker orchestration (src/docker_runner/episode.py) ──────────────────
 CONTAINER_READY_TIMEOUT_S = 15.0        # max wait for a container to answer /health or /openapi.json
 CONTAINER_READY_POLL_INTERVAL_S = 0.3

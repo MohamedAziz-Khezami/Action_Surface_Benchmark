@@ -6,6 +6,7 @@ import datetime
 from pathlib import Path
 
 from cli import parse_args
+from config import CONSECUTIVE_API_ERROR_LIMIT
 from src.agent.loop import run_episode
 from src.db.scenarios.crm_scenario.tasks.build_tasks import FROZEN_DIR, build_all, load_tasks
 from src.llm_clients.registry import load_model_registry
@@ -96,21 +97,45 @@ def main() -> None:
         writer = csv.DictWriter(f, fieldnames=CSV_FIELDS)
         writer.writeheader()
         for model_config in selected_models:
-            for surface in surfaces:
-                for mode in modes_for(model_config):
-                    for task in tasks:
-                        # Trials of one cell run back to back. Each run_episode
-                        # gets its own fresh world copy and container, so trials
-                        # never share state; the model's own sampling supplies
-                        # the i.i.d. variation the pass^k estimate reads.
-                        for trial in range(n_trials):
-                            row = run_episode(model_config, surface, mode, task, trajectory_dir=str(trajectory_dir))
-                            row["trial"] = trial
-                            writer.writerow(row)
-                            f.flush()
-                            done += 1
-                            print(f"[{done}/{total}] {model_config.name} {surface} {mode} "
-                                  f"{task['task_id']} trial={trial} -> passed={row['passed']} turns={row['model_turns']}")
+            # One flat list of this model's episodes rather than four nested
+            # loops, so the circuit breaker below can stop the model with a
+            # single `break` instead of unwinding through flag checks. Order is
+            # unchanged: surface, then mode, then task, then trial — trials of
+            # one cell still run back to back. Each run_episode gets its own
+            # fresh world copy and containers, so trials never share state; the
+            # model's own sampling supplies the i.i.d. variation pass^k reads.
+            episodes = [(surface, mode, task, trial)
+                        for surface in surfaces
+                        for mode in modes_for(model_config)
+                        for task in tasks
+                        for trial in range(n_trials)]
+
+            consecutive_api_errors = 0
+            for surface, mode, task, trial in episodes:
+                row = run_episode(model_config, surface, mode, task, trajectory_dir=str(trajectory_dir))
+                row["trial"] = trial
+                writer.writerow(row)
+                f.flush()
+                done += 1
+                print(f"[{done}/{total}] {model_config.name} {surface} {mode} "
+                      f"{task['task_id']} trial={trial} -> passed={row['passed']} turns={row['model_turns']}")
+
+                # A run of back-to-back API failures means the server has
+                # stopped serving, not that the model is answering badly —
+                # every further episode would just buy another timeout.
+                if row["model_api_error"]:
+                    consecutive_api_errors += 1
+                    if consecutive_api_errors >= CONSECUTIVE_API_ERROR_LIMIT:
+                        skipped = len(episodes) - episodes.index((surface, mode, task, trial)) - 1
+                        done += skipped
+                        print(f"\n[{model_config.name}] ABANDONED — {consecutive_api_errors} consecutive "
+                              f"model API errors; the server has stopped responding.\n"
+                              f"  last error: {row['model_api_error_message'][:160]}\n"
+                              f"  skipping this model's remaining {skipped} episode(s) "
+                              f"and moving on.\n")
+                        break
+                else:
+                    consecutive_api_errors = 0
 
     print(f"\nwrote {out_path}")
 

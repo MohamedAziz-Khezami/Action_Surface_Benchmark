@@ -143,7 +143,15 @@ for line in "${MODEL_LINES[@]}"; do
             echo "[$NAME] llama-server exited during startup — check ${SERVER_LOG}" >&2
             break
         fi
-        if curl -s -o /dev/null -m 3 "http://localhost:${PORT}/v1/models"; then
+        # /health, not /v1/models: the HTTP layer answers /v1/models as soon as
+        # it binds, while the weights are still loading, so the old check passed
+        # early and the first episodes died with "503 Loading model". /health
+        # returns 503 until the model is actually servable.
+        #
+        # -f is load-bearing: without it curl exits 0 on an HTTP 503, so the
+        # loop would treat "still loading" as ready no matter which endpoint
+        # it polled.
+        if curl -sf -o /dev/null -m 3 "http://localhost:${PORT}/health"; then
             READY=1
             break
         fi
@@ -161,9 +169,13 @@ for line in "${MODEL_LINES[@]}"; do
     fi
     echo "[$NAME] ready after ~${ELAPSED}s"
 
-    echo "[$NAME] running full benchmark (difficulty=${DIFFICULTY})..."
+    echo "[$NAME] running full benchmark (difficulty=${DIFFICULTY})${EXTRA_ARGS:+ ${EXTRA_ARGS}}..."
+    # EXTRA_ARGS is deliberately unquoted so multiple flags word-split, e.g.
+    #   EXTRA_ARGS="--n-trials 5 --limit 10" ./run_full_benchmark.sh easy
+    # Anything main.py run accepts can be passed this way without editing here.
+    # Note --n-trials multiplies runtime by k, so pair it with --limit.
     python3 main.py run --models "$NAME" --difficulty "$DIFFICULTY" \
-        --out "${OUT_DIR}/${NAME}.csv"
+        --out "${OUT_DIR}/${NAME}.csv" ${EXTRA_ARGS:-}
     RUN_STATUS=$?
     if [[ $RUN_STATUS -ne 0 ]]; then
         echo "[$NAME] benchmark run exited with status ${RUN_STATUS} — see output above" >&2

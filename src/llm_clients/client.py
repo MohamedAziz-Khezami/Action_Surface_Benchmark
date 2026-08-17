@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 
 import openai
 
+from config import MODEL_REQUEST_TIMEOUT_S
 from src.llm_clients.registry import ModelConfig
 
 
@@ -26,7 +27,10 @@ class OpenAICompatibleClient:
 
     def __init__(self, config: ModelConfig):
         api_key = os.environ.get(config.api_key_env, "not-needed") if config.api_key_env else "not-needed"
-        self._client = openai.OpenAI(base_url=config.base_url, api_key=api_key)
+        # An explicit timeout matters: the SDK's 600s default lets one stuck
+        # turn stall an episode for ten minutes (see MODEL_REQUEST_TIMEOUT_S).
+        self._client = openai.OpenAI(base_url=config.base_url, api_key=api_key,
+                                      timeout=MODEL_REQUEST_TIMEOUT_S)
         self._model_id = config.model_id
 
     def complete(self, messages: list[dict], tools: list[dict] | None = None) -> ModelResponse:
