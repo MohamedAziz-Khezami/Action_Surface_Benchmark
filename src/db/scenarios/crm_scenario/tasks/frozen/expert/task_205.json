@@ -4,27 +4,45 @@
     "n_updated"
   ],
   "ground_truth": {
-    "n_updated": 3
+    "n_updated": 6
   },
   "expected_added": {},
   "expected_changed": {
     "leads": [
       {
-        "id": 18,
+        "id": 20,
         "fields": {
           "score": 64
         }
       },
       {
-        "id": 24,
+        "id": 26,
         "fields": {
           "score": 39
         }
       },
       {
-        "id": 40,
+        "id": 28,
         "fields": {
           "score": 57
+        }
+      },
+      {
+        "id": 12,
+        "fields": {
+          "score": 85
+        }
+      },
+      {
+        "id": 7,
+        "fields": {
+          "score": 29
+        }
+      },
+      {
+        "id": 41,
+        "fields": {
+          "score": 80
         }
       }
     ]
@@ -61,8 +79,8 @@
       "removed"
     ]
   },
-  "n_functions": 4,
-  "n_actions": 3,
+  "n_functions": 7,
+  "n_actions": 6,
   "task_id": "task_205",
   "world_seed": 1205,
   "difficulty": "expert",

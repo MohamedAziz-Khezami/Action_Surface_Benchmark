@@ -42,10 +42,14 @@ def run_capturing_last_expr(code: str, namespace: dict):
 
 @app.route("/exec", methods=["POST"])
 def exec_code():
-    code = request.get_json()["code"]
+    payload = request.get_json()
+    code = payload["code"]
     stdout_buf = io.StringIO()
     value, error = None, None
     tools.call_count = 0
+    # Absent key => unlimited, so an older harness talking to a newer image
+    # behaves exactly as before rather than silently capping at zero.
+    tools.call_limit = payload.get("max_tool_calls")
     try:
         signal.alarm(_EXEC_TIMEOUT_S)
         try:

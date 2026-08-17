@@ -29,8 +29,8 @@ params:
   rep_name: {draw: person_name}
   contact_name: {draw: person_name}
   company: {draw: company}
-  n_high: {randint: [1, 3]}   # will be >7 days overdue -> escalate
-  n_low: {randint: [1, 3]}    # will be <=7 days overdue -> push due date
+  n_high: {choice: [1, 2, 3, 4, 5]}   # will be >7 days overdue -> escalate
+  n_low: {choice: [1, 2, 3, 4, 5]}    # will be <=7 days overdue -> push due date
   # quoted directly in the query below (the sibling act_on_a_* / decide_by_*
   # templates all do the same for any free-text field the verifier checks
   # exactly -- the model must never have to guess ungrounded text).

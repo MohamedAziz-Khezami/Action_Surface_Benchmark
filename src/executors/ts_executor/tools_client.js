@@ -1,14 +1,32 @@
 // tools_client.js — lives inside the TS executor container.
 'use strict';
 
-// `counter` is a mutable {count} object exec_server.js resets before each
-// /exec call and reads afterward, feeding the meter's tool_calls_made.
+// `counter` is a mutable {count, limit} object exec_server.js resets before
+// each /exec call and reads afterward, feeding the meter's tool_calls_made.
+// `limit` is the max tool calls allowed in ONE /exec block (null = unlimited,
+// the default). It is set per request rather than baked into the image, so the
+// same container serves capped and uncapped episodes with no rebuild.
 function makeToolsProxy(baseUrl) {
-  const counter = { count: 0 };
+  const counter = { count: 0, limit: null };
   const proxy = new Proxy({}, {
     get(_target, prop) {
       if (typeof prop !== 'string') return undefined;
       return async (args) => {
+        // Checked BEFORE the request, so a rejected call never reaches the
+        // tool-server: a cap that let the write through and only complained
+        // afterwards would not restrict the agent's behaviour at all.
+        if (counter.limit !== null && counter.count >= counter.limit) {
+          const err = new Error(
+            `tool_call_limit_exceeded: this execute() block may make at most ` +
+            `${counter.limit} tool call(s); '${prop}' would be number ` +
+            `${counter.count + 1}. Return what you have and make the remaining ` +
+            `calls in a following execute() block.`);
+          err.code = 'tool_call_limit_exceeded';
+          // Own name, not a bare Error, so the meter can bucket a cap hit
+          // separately from a genuine bug in the model's code.
+          err.name = 'ToolCallLimitExceeded';
+          throw err;
+        }
         counter.count += 1;
         const resp = await fetch(`${baseUrl}/${prop}`, {
           method: 'POST',

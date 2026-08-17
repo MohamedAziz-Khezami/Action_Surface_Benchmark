@@ -4,23 +4,31 @@
     "n_scheduled"
   ],
   "ground_truth": {
-    "n_scheduled": 2
+    "n_scheduled": 4
   },
   "expected_added": {
     "followups": [
       {
-        "deal_id": 3,
+        "deal_id": 28,
         "due_date": "2026-06-22"
       },
       {
-        "deal_id": 10,
+        "deal_id": 5,
+        "due_date": "2026-06-22"
+      },
+      {
+        "deal_id": 30,
+        "due_date": "2026-06-22"
+      },
+      {
+        "deal_id": 36,
         "due_date": "2026-06-22"
       }
     ]
   },
   "expected_changed": {},
   "exact_added_count": {
-    "followups": 2
+    "followups": 4
   },
   "forbidden": {
     "reps": [
@@ -53,8 +61,8 @@
       "removed"
     ]
   },
-  "n_functions": 3,
-  "n_actions": 2,
+  "n_functions": 5,
+  "n_actions": 4,
   "task_id": "task_232",
   "world_seed": 1232,
   "difficulty": "expert",

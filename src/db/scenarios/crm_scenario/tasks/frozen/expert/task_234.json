@@ -4,13 +4,25 @@
     "n_updated"
   ],
   "ground_truth": {
-    "n_updated": 2
+    "n_updated": 4
   },
   "expected_added": {},
   "expected_changed": {
     "deals": [
       {
-        "id": 19,
+        "id": 18,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 25,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 15,
         "fields": {
           "stage": "qualification"
         }
@@ -55,8 +67,8 @@
       "removed"
     ]
   },
-  "n_functions": 3,
-  "n_actions": 2,
+  "n_functions": 5,
+  "n_actions": 4,
   "task_id": "task_234",
   "world_seed": 1234,
   "difficulty": "expert",

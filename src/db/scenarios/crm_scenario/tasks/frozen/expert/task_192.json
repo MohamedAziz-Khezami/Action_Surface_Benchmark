@@ -4,17 +4,22 @@
     "n_escalated"
   ],
   "ground_truth": {
-    "n_escalated": 2
+    "n_escalated": 3
   },
   "expected_added": {
     "activities": [
       {
-        "deal_id": 19,
+        "deal_id": 38,
         "type": "call",
         "subject": "escalation call"
       },
       {
-        "deal_id": 35,
+        "deal_id": 26,
+        "type": "call",
+        "subject": "escalation call"
+      },
+      {
+        "deal_id": 39,
         "type": "call",
         "subject": "escalation call"
       }
@@ -23,21 +28,27 @@
   "expected_changed": {
     "followups": [
       {
-        "id": 11,
+        "id": 5,
+        "fields": {
+          "due_date": "2026-06-08"
+        }
+      },
+      {
+        "id": 3,
         "fields": {
           "due_date": "2026-05-31"
         }
       },
       {
-        "id": 19,
+        "id": 20,
         "fields": {
-          "due_date": "2026-05-31"
+          "due_date": "2026-05-29"
         }
       }
     ]
   },
   "exact_added_count": {
-    "activities": 2
+    "activities": 3
   },
   "forbidden": {
     "reps": [
@@ -69,8 +80,8 @@
       "removed"
     ]
   },
-  "n_functions": 5,
-  "n_actions": 4,
+  "n_functions": 7,
+  "n_actions": 6,
   "task_id": "task_192",
   "world_seed": 1192,
   "difficulty": "expert",

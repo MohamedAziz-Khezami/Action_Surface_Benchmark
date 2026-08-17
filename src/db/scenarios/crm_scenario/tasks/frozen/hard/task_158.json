@@ -4,17 +4,27 @@
     "n_logged"
   ],
   "ground_truth": {
-    "n_logged": 2
+    "n_logged": 4
   },
   "expected_added": {
     "activities": [
       {
-        "deal_id": 31,
+        "deal_id": 23,
         "type": "note",
         "subject": "quarterly review"
       },
       {
-        "deal_id": 25,
+        "deal_id": 1,
+        "type": "note",
+        "subject": "quarterly review"
+      },
+      {
+        "deal_id": 15,
+        "type": "note",
+        "subject": "quarterly review"
+      },
+      {
+        "deal_id": 16,
         "type": "note",
         "subject": "quarterly review"
       }
@@ -22,7 +32,7 @@
   },
   "expected_changed": {},
   "exact_added_count": {
-    "activities": 2
+    "activities": 4
   },
   "forbidden": {
     "reps": [
@@ -55,8 +65,8 @@
       "removed"
     ]
   },
-  "n_functions": 3,
-  "n_actions": 2,
+  "n_functions": 5,
+  "n_actions": 4,
   "task_id": "task_158",
   "world_seed": 1158,
   "difficulty": "hard",

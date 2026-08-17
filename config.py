@@ -3,7 +3,57 @@ from __future__ import annotations
 
 # ── agent loop (src/agent/loop.py) ───────────────────────────────────────
 
+# Floor on the per-episode turn budget: no task ever gets fewer turns than
+# this, whatever its size. Kept at the historical fixed value so small tasks
+# behave exactly as they did before the budget started scaling.
 TURN_BUDGET = 20
+
+# The budget SCALES with the task's required tool calls, because a fixed
+# budget is not surface-neutral. Measured on 3,360 episodes (six models, the
+# broken qwen2.5-14b excluded), turn use per required call is ~1.0 for
+# json_mcp and well under that for the code surfaces, which batch several
+# calls into one execute(). A single flat ceiling therefore binds on json_mcp
+# long before it binds on anything else, and it binds harder the bigger the
+# task gets:
+#
+#   required calls:        2       3       4       5       6       7
+#   python  hit budget:  0.0%    0.0%    0.0%    0.0%    0.0%    0.0%
+#   ts      hit budget:  1.7%    4.4%    0.5%    0.0%    0.0%    0.0%
+#   js      hit budget:  3.9%    5.4%    1.4%    3.3%    8.3%    0.0%
+#   json_mcp hit budget: 1.9%    1.9%    1.0%    3.3%   33.3%   33.3%
+#
+# At six required calls json_mcp already fails a third of its episodes by
+# running out of turns while every code surface fails none. Under a fixed 20
+# the large iteration groups this benchmark needs (see the write-iteration
+# templates, groups up to 10) would hand code-mode a decisive win that is
+# purely an artifact of the ceiling — and would corrupt the very thing the
+# large groups exist to measure, since an episode killed mid-iteration writes
+# FEWER rows, understating blast radius rather than revealing it.
+#
+# So every task gets room proportional to its own work, under one rule applied
+# identically to all four surfaces. Sizing comes from the same data: json_mcp
+# spends ~1.95 turns per required call on average with a p90 about 1.5x that,
+# so ~3x the requirement is the tail and 5x leaves the comfortable margin the
+# 1-2% hit rates at 3-4 calls were already getting.
+#
+# The budget is never shown to the model, so deriving it from n_functions
+# leaks nothing about the answer.
+TURN_BUDGET_PER_FUNCTION = 5
+# Hard ceiling regardless of task size: a genuinely stuck model must still
+# terminate. At the largest group (10 -> 11 required calls) the scaled budget
+# is 60, and mean observed use would be ~21, so this caps runaway episodes
+# without binding on honest ones.
+TURN_BUDGET_MAX = 60
+
+
+def turn_budget_for(n_functions: int) -> int:
+    """Turn budget for a task needing `n_functions` tool calls at minimum.
+
+    Monotone in n_functions and never below TURN_BUDGET, so no task's budget
+    can shrink relative to the historical fixed 20 — a smaller budget would
+    silently fail episodes that used to pass and make old results
+    incomparable for reasons unrelated to the action surface."""
+    return min(TURN_BUDGET_MAX, max(TURN_BUDGET, TURN_BUDGET_PER_FUNCTION * n_functions))
 
 
 # ── cost accounting (src/meter/meter.py) ─────────────────────────────────

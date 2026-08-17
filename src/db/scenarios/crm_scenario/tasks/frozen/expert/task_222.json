@@ -4,7 +4,7 @@
     "n_escalated"
   ],
   "ground_truth": {
-    "n_escalated": 3
+    "n_escalated": 4
   },
   "expected_added": {
     "activities": [
@@ -22,33 +22,32 @@
         "deal_id": 3,
         "type": "call",
         "subject": "second reminder"
+      },
+      {
+        "deal_id": 36,
+        "type": "call",
+        "subject": "second reminder"
       }
     ]
   },
   "expected_changed": {
     "followups": [
       {
-        "id": 18,
+        "id": 17,
         "fields": {
           "due_date": "2026-06-04"
         }
       },
       {
-        "id": 17,
-        "fields": {
-          "due_date": "2026-06-03"
-        }
-      },
-      {
         "id": 9,
         "fields": {
-          "due_date": "2026-06-05"
+          "due_date": "2026-06-03"
         }
       }
     ]
   },
   "exact_added_count": {
-    "activities": 3
+    "activities": 4
   },
   "forbidden": {
     "reps": [

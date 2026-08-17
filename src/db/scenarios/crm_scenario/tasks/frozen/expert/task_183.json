@@ -4,27 +4,39 @@
     "n_scheduled"
   ],
   "ground_truth": {
-    "n_scheduled": 3
+    "n_scheduled": 6
   },
   "expected_added": {
     "followups": [
       {
-        "deal_id": 39,
+        "deal_id": 32,
         "due_date": "2026-06-22"
       },
       {
-        "deal_id": 24,
+        "deal_id": 16,
         "due_date": "2026-06-22"
       },
       {
-        "deal_id": 7,
+        "deal_id": 35,
+        "due_date": "2026-06-22"
+      },
+      {
+        "deal_id": 25,
+        "due_date": "2026-06-22"
+      },
+      {
+        "deal_id": 36,
+        "due_date": "2026-06-22"
+      },
+      {
+        "deal_id": 41,
         "due_date": "2026-06-22"
       }
     ]
   },
   "expected_changed": {},
   "exact_added_count": {
-    "followups": 3
+    "followups": 6
   },
   "forbidden": {
     "reps": [
@@ -57,8 +69,8 @@
       "removed"
     ]
   },
-  "n_functions": 4,
-  "n_actions": 3,
+  "n_functions": 7,
+  "n_actions": 6,
   "task_id": "task_183",
   "world_seed": 1183,
   "difficulty": "expert",

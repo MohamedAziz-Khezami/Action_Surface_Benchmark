@@ -1,42 +1,41 @@
 {
-  "query": "For each open follow-up on Hugo Weber's deals: if it's more than 7 days overdue, log a call with the subject 'second reminder' about it; otherwise push its due date back by 3 days. Report how many you escalated as n_escalated.",
+  "query": "For each open follow-up on Hugo Weber's deals: if it's more than 7 days overdue, log a call with the subject 'escalation call' about it; otherwise push its due date back by 3 days. Report how many you escalated as n_escalated.",
   "answer_keys": [
     "n_escalated"
   ],
   "ground_truth": {
-    "n_escalated": 3
+    "n_escalated": 4
   },
   "expected_added": {
     "activities": [
       {
-        "deal_id": 14,
+        "deal_id": 9,
         "type": "call",
-        "subject": "second reminder"
+        "subject": "escalation call"
       },
       {
-        "deal_id": 11,
+        "deal_id": 33,
         "type": "call",
-        "subject": "second reminder"
+        "subject": "escalation call"
       },
       {
-        "deal_id": 15,
+        "deal_id": 36,
         "type": "call",
-        "subject": "second reminder"
+        "subject": "escalation call"
+      },
+      {
+        "deal_id": 34,
+        "type": "call",
+        "subject": "escalation call"
       }
     ]
   },
   "expected_changed": {
     "followups": [
       {
-        "id": 21,
-        "fields": {
-          "due_date": "2026-06-08"
-        }
-      },
-      {
         "id": 18,
         "fields": {
-          "due_date": "2026-06-01"
+          "due_date": "2026-05-29"
         }
       },
       {
@@ -48,7 +47,7 @@
     ]
   },
   "exact_added_count": {
-    "activities": 3
+    "activities": 4
   },
   "forbidden": {
     "reps": [

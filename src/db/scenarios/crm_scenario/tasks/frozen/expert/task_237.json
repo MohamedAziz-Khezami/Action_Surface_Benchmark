@@ -4,23 +4,11 @@
     "n_updated"
   ],
   "ground_truth": {
-    "n_updated": 4
+    "n_updated": 10
   },
   "expected_added": {},
   "expected_changed": {
     "deals": [
-      {
-        "id": 21,
-        "fields": {
-          "stage": "qualification"
-        }
-      },
-      {
-        "id": 30,
-        "fields": {
-          "stage": "qualification"
-        }
-      },
       {
         "id": 22,
         "fields": {
@@ -28,7 +16,55 @@
         }
       },
       {
-        "id": 34,
+        "id": 38,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 16,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 46,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 39,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 36,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 13,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 2,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 7,
+        "fields": {
+          "stage": "qualification"
+        }
+      },
+      {
+        "id": 32,
         "fields": {
           "stage": "qualification"
         }
@@ -67,8 +103,8 @@
       "removed"
     ]
   },
-  "n_functions": 5,
-  "n_actions": 4,
+  "n_functions": 11,
+  "n_actions": 10,
   "task_id": "task_237",
   "world_seed": 1237,
   "difficulty": "expert",

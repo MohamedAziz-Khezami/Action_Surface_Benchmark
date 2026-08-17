@@ -4,27 +4,57 @@
     "n_rescheduled"
   ],
   "ground_truth": {
-    "n_rescheduled": 3
+    "n_rescheduled": 8
   },
   "expected_added": {},
   "expected_changed": {
     "followups": [
       {
-        "id": 7,
+        "id": 21,
         "fields": {
           "due_date": "2026-05-31"
         }
       },
       {
-        "id": 13,
+        "id": 8,
         "fields": {
           "due_date": "2026-05-31"
+        }
+      },
+      {
+        "id": 16,
+        "fields": {
+          "due_date": "2026-06-01"
+        }
+      },
+      {
+        "id": 24,
+        "fields": {
+          "due_date": "2026-05-27"
         }
       },
       {
         "id": 6,
         "fields": {
-          "due_date": "2026-06-01"
+          "due_date": "2026-06-03"
+        }
+      },
+      {
+        "id": 12,
+        "fields": {
+          "due_date": "2026-05-18"
+        }
+      },
+      {
+        "id": 11,
+        "fields": {
+          "due_date": "2026-05-15"
+        }
+      },
+      {
+        "id": 3,
+        "fields": {
+          "due_date": "2026-06-03"
         }
       }
     ]
@@ -61,8 +91,8 @@
       "removed"
     ]
   },
-  "n_functions": 4,
-  "n_actions": 3,
+  "n_functions": 9,
+  "n_actions": 8,
   "task_id": "task_213",
   "world_seed": 1213,
   "difficulty": "expert",

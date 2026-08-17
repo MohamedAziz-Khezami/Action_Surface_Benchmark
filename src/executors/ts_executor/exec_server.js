@@ -114,8 +114,11 @@ function wrapWithReturn(code) {
   return code;
 }
 
-async function execBlock(code) {
+async function execBlock(code, maxToolCalls) {
   toolCallCounter.count = 0;
+  // undefined => unlimited, so an older harness talking to a newer image
+  // behaves exactly as before rather than silently capping at zero.
+  toolCallCounter.limit = maxToolCalls ?? null;
   // Wrap BEFORE type-checking, not after: at execution time the code always
   // runs inside `(async () => {...})()`, so `await` is legal there. But
   // type-checking the model's raw code directly (unwrapped) means TS sees a
@@ -166,8 +169,8 @@ const server = http.createServer((req, res) => {
     req.on('data', (chunk) => { body += chunk; });
     req.on('end', async () => {
       try {
-        const { code } = JSON.parse(body);
-        const result = await execBlock(code);
+        const { code, max_tool_calls: maxToolCalls } = JSON.parse(body);
+        const result = await execBlock(code, maxToolCalls);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(result));
       } catch (e) {

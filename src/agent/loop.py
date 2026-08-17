@@ -21,7 +21,7 @@ import uuid
 import requests
 
 from config import RETRY_DELAYS_S as _TOOL_CALL_RETRY_DELAYS_S
-from config import CONTAINER_READY_TIMEOUT_S, SANDBOX_USD_PER_SECOND, TOOL_CALL_HTTP_TIMEOUT_S, TRAJECTORY_DIR, TURN_BUDGET
+from config import CONTAINER_READY_TIMEOUT_S, SANDBOX_USD_PER_SECOND, TOOL_CALL_HTTP_TIMEOUT_S, TRAJECTORY_DIR, turn_budget_for
 from src.agent import prompts
 from src.agent.final_answer import is_final_answer, parse_final_answer
 from src.agent.trajectory import Trajectory
@@ -122,8 +122,15 @@ def _safe_save_trajectory(traj: Trajectory, trajectory_dir: str) -> None:
 
 def run_episode(model_config, surface: str, interaction_mode: str, task: dict,
                  ready_timeout_s: float = CONTAINER_READY_TIMEOUT_S,
-                 trajectory_dir: str | None = None) -> dict:
-    """trajectory_dir: where this episode's trajectory JSON is written. Defaults
+                 trajectory_dir: str | None = None,
+                 max_tool_calls_per_exec: int | None = None) -> dict:
+    """max_tool_calls_per_exec: the batching ablation. Caps tool calls per
+    execute() block (None = uncapped, the default). At 1 a code surface can no
+    longer batch, so it must take the same one-call-per-turn path json_mcp
+    takes; whatever advantage survives is attributable to writing code rather
+    than to batching. Ignored for json_mcp, which has no execute() to cap.
+
+    trajectory_dir: where this episode's trajectory JSON is written. Defaults
     to TRAJECTORY_DIR (results/trajectories) for standalone/test use; main.py
     passes a directory named after the run's own CSV, so a run's CSV and its
     trajectories always live under matching names instead of one shared,
@@ -133,12 +140,16 @@ def run_episode(model_config, surface: str, interaction_mode: str, task: dict,
     world_seed = task["world_seed"]
     episode_id = uuid.uuid4().hex[:8]
     meter = EpisodeMeter(episode_id, model_config.name, surface, interaction_mode, task["task_id"], task["difficulty"], world_seed, task["n_functions"], task["template"], task["pattern"],
+                         max_tool_calls_per_exec=max_tool_calls_per_exec,
+                         turn_budget=turn_budget_for(task["n_functions"]),
                          price_in_per_mtok=model_config.price_in_per_mtok,
                          price_out_per_mtok=model_config.price_out_per_mtok,
                          sandbox_usd_per_second=SANDBOX_USD_PER_SECOND)
     traj = Trajectory(episode_id, model_config.name, surface, interaction_mode, task["task_id"], task["query"])
     client = make_client(model_config)
-    turn_budget = TURN_BUDGET
+    # Scaled per task, not a flat constant — see config.turn_budget_for for why
+    # a fixed ceiling is not surface-neutral. Identical rule for all surfaces.
+    turn_budget = turn_budget_for(task["n_functions"])
 
     try:
         # world_db is the frozen world artifact attached by load_tasks();
@@ -153,7 +164,8 @@ def run_episode(model_config, surface: str, interaction_mode: str, task: dict,
 
     try:
         baseline = db_mod.snapshot(episode.db_path)
-        messages = prompts.build_initial_messages(surface, interaction_mode, task)
+        messages = prompts.build_initial_messages(
+            surface, interaction_mode, task, max_tool_calls_per_exec)
         tools_param = prompts.build_tools_param(surface, interaction_mode, task)
         answer_fields = None
 
@@ -195,7 +207,8 @@ def run_episode(model_config, surface: str, interaction_mode: str, task: dict,
                                                   "or write FINAL_ANSWER if you already have the answer."})
                     continue
                 t0 = time.monotonic()
-                exec_result = episode.exec(code, surface)
+                exec_result = episode.exec(code, surface,
+                                            max_tool_calls=max_tool_calls_per_exec)
                 exec_latency = time.monotonic() - t0
                 meter.record_exec_result(exec_result, exec_latency)
                 traj.record_exec_result(code, surface, exec_latency, exec_result)
@@ -238,7 +251,8 @@ def run_episode(model_config, surface: str, interaction_mode: str, task: dict,
                 else:  # execute(code, lang)
                     t0 = time.monotonic()
                     exec_result = episode.exec(tc["arguments"]["code"],
-                                                tc["arguments"].get("lang", surface))
+                                                tc["arguments"].get("lang", surface),
+                                                max_tool_calls=max_tool_calls_per_exec)
                     exec_latency = time.monotonic() - t0
                     meter.record_exec_result(exec_result, exec_latency)
                     traj.record_exec_result(tc["arguments"]["code"], tc["arguments"].get("lang", surface), exec_latency, exec_result)

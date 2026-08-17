@@ -36,7 +36,7 @@ n_actions: "{n_contacts}"
 params:
   from_rep_name: {draw: person_name}
   to_rep_name: {draw: person_name}
-  n_contacts: {choice: [2, 3, 4]}
+  n_contacts: {choice: [2, 4, 6, 8, 10]}
 
 # ── 2. rows planted into the world ─────────────────────────────────────
 kernel:

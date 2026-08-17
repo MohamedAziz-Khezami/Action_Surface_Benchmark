@@ -4,25 +4,43 @@
     "n_won"
   ],
   "ground_truth": {
-    "n_won": 3
+    "n_won": 6
   },
   "expected_added": {},
   "expected_changed": {
     "deals": [
       {
-        "id": 39,
+        "id": 26,
         "fields": {
           "stage": "won"
         }
       },
       {
-        "id": 21,
+        "id": 25,
         "fields": {
           "stage": "won"
         }
       },
       {
-        "id": 19,
+        "id": 31,
+        "fields": {
+          "stage": "won"
+        }
+      },
+      {
+        "id": 37,
+        "fields": {
+          "stage": "won"
+        }
+      },
+      {
+        "id": 36,
+        "fields": {
+          "stage": "won"
+        }
+      },
+      {
+        "id": 2,
         "fields": {
           "stage": "won"
         }
@@ -61,8 +79,8 @@
       "removed"
     ]
   },
-  "n_functions": 4,
-  "n_actions": 3,
+  "n_functions": 7,
+  "n_actions": 6,
   "task_id": "task_151",
   "world_seed": 1151,
   "difficulty": "hard",

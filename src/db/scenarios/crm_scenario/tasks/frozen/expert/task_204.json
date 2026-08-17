@@ -4,33 +4,69 @@
     "n_rescheduled"
   ],
   "ground_truth": {
-    "n_rescheduled": 4
+    "n_rescheduled": 10
   },
   "expected_added": {},
   "expected_changed": {
     "followups": [
       {
-        "id": 16,
+        "id": 3,
         "fields": {
           "due_date": "2026-05-25"
         }
       },
       {
-        "id": 15,
+        "id": 5,
         "fields": {
           "due_date": "2026-05-20"
         }
       },
       {
-        "id": 7,
+        "id": 18,
         "fields": {
           "due_date": "2026-05-15"
         }
       },
       {
-        "id": 17,
+        "id": 19,
         "fields": {
           "due_date": "2026-05-22"
+        }
+      },
+      {
+        "id": 11,
+        "fields": {
+          "due_date": "2026-06-05"
+        }
+      },
+      {
+        "id": 23,
+        "fields": {
+          "due_date": "2026-05-22"
+        }
+      },
+      {
+        "id": 15,
+        "fields": {
+          "due_date": "2026-06-03"
+        }
+      },
+      {
+        "id": 27,
+        "fields": {
+          "due_date": "2026-05-16"
+        }
+      },
+      {
+        "id": 24,
+        "fields": {
+          "due_date": "2026-05-29"
+        }
+      },
+      {
+        "id": 8,
+        "fields": {
+          "due_date": "2026-05-26"
         }
       }
     ]
@@ -67,8 +103,8 @@
       "removed"
     ]
   },
-  "n_functions": 5,
-  "n_actions": 4,
+  "n_functions": 11,
+  "n_actions": 10,
   "task_id": "task_204",
   "world_seed": 1204,
   "difficulty": "expert",

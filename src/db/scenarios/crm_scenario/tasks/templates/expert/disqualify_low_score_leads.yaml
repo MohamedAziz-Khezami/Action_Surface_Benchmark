@@ -30,7 +30,7 @@ params:
   rep_name: {draw: person_name}
   contact_name: {draw: person_name}
   company: {draw: company}
-  n_low: {choice: [2, 3]}       # score < 30 -> set unqualified
+  n_low: {choice: [2, 4, 6, 8, 10]}       # score < 30 -> set unqualified
   n_high: {choice: [1, 2]}      # score >= 30 -> left alone
 
 # ── 2. rows planted into the world ─────────────────────────────────────

@@ -38,9 +38,12 @@ function wrapWithReturn(code) {
   return code;
 }
 
-async function execBlock(code) {
+async function execBlock(code, maxToolCalls) {
   let stdout = '', value = null, error = null;
   toolCallCounter.count = 0;
+  // undefined => unlimited, so an older harness talking to a newer image
+  // behaves exactly as before rather than silently capping at zero.
+  toolCallCounter.limit = maxToolCalls ?? null;
   const origLog = console.log;
   console.log = (...a) => { stdout += a.map(String).join(' ') + '\n'; };
   try {
@@ -75,8 +78,8 @@ const server = http.createServer((req, res) => {
     req.on('data', (chunk) => { body += chunk; });
     req.on('end', async () => {
       try {
-        const { code } = JSON.parse(body);
-        const result = await execBlock(code);
+        const { code, max_tool_calls: maxToolCalls } = JSON.parse(body);
+        const result = await execBlock(code, maxToolCalls);
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify(result));
       } catch (e) {

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import csv
 import datetime
+import random
 from pathlib import Path
 
 from cli import parse_args
@@ -13,17 +14,56 @@ from src.llm_clients.registry import load_model_registry
 
 CSV_FIELDS = [
     "episode_id", "trial", "model", "surface", "interaction_mode", "task_id", "difficulty", "template", "pattern", "world_seed",
+    "max_tool_calls_per_exec", "turn_budget",
     "passed", "answer_correct", "db_correct", "fulfillment_score",
     "n_functions_expected", "tool_calls_made", "model_turns",
     "total_latency_seconds", "model_latency_seconds", "execution_latency_seconds",
     "input_tokens", "output_tokens", "total_tokens",
     "cost_priced", "input_cost_usd", "output_cost_usd", "token_cost_usd", "sandbox_cost_usd", "episode_cost_usd",
-    "tool_error_count", "syntax_error_count", "type_error_count", "runtime_error_count", "parse_error_count",
+    "tool_error_count", "syntax_error_count", "type_error_count", "runtime_error_count", "parse_error_count", "exec_cap_hit_count",
     "recovered", "unauthorized_write_count", "had_unauthorized_write",
     "hit_turn_budget", "infra_error", "model_api_error", "model_api_error_message",
     "episode_error", "episode_error_message",
     "verifier_reasons",
 ]
+
+
+def _sample_tasks(tasks: list[dict], limit: int, seed: int) -> list[dict]:
+    """`limit` tasks per difficulty tier, drawn at random but reproducibly.
+
+    Taking the FIRST n by filename — the previous behaviour — is deterministic
+    but not representative: whichever templates happen to sort late are
+    systematically excluded, so a subset silently loses whole task types. A
+    seeded sample spreads the draw across templates instead.
+
+    The seed is a fixed constant, never mixed with the model, surface, or
+    clock, because every cell of the study must face the SAME tasks. If two
+    surfaces were compared on different task sets the comparison would be
+    meaningless, so the sample is drawn once, here, before any model or
+    surface loop sees it.
+
+    Tier order and within-tier order are restored after sampling so runs read
+    in a stable, familiar sequence rather than shuffled."""
+    by_tier: dict[str, list[dict]] = {}
+    for t in tasks:
+        by_tier.setdefault(t["difficulty"], []).append(t)
+
+    sampled: list[dict] = []
+    for tier, tier_tasks in by_tier.items():
+        if limit >= len(tier_tasks):
+            sampled.extend(tier_tasks)
+            continue
+        # Sort before drawing: rng.sample() picks by POSITION, so an unsorted
+        # input would make the subset depend on whatever order load_tasks()
+        # happened to return — a corpus rebuild that reordered files would
+        # silently change which tasks the study runs on.
+        ordered = sorted(tier_tasks, key=lambda t: t["task_id"])
+        # seed per tier so a tier's draw doesn't shift when another tier's
+        # task count changes (e.g. after regenerating one tier's corpus)
+        rng = random.Random(f"{seed}:{tier}")
+        picked = rng.sample(ordered, limit)
+        sampled.extend(sorted(picked, key=lambda t: t["task_id"]))
+    return sampled
 
 
 def main() -> None:
@@ -64,10 +104,7 @@ def main() -> None:
     selector = "all" if args.difficulty == "all" else args.difficulty
     tasks = load_tasks(selector)
     if args.limit:
-        by_tier: dict[str, list[dict]] = {}
-        for t in tasks:
-            by_tier.setdefault(t["difficulty"], []).append(t)
-        tasks = [t for tier_tasks in by_tier.values() for t in tier_tasks[: args.limit]]
+        tasks = _sample_tasks(tasks, args.limit, args.sample_seed)
 
     out_path = Path(args.out) if args.out else Path(
         f"results/run_{datetime.datetime.now():%Y-%m-%d_%H%M%S}.csv")
@@ -89,6 +126,17 @@ def main() -> None:
         if args.interaction_modes:
             return args.interaction_modes.split(",")
         return ["tool_call"] if model_config.supports_tool_calling else ["text_block"]
+
+    if args.max_tool_calls_per_exec is not None:
+        if args.max_tool_calls_per_exec < 1:
+            raise SystemExit("--max-tool-calls-per-exec must be >= 1 "
+                              "(0 would forbid every tool call, making every task unsolvable)")
+        # Announced loudly: a capped run is NOT comparable to an uncapped one,
+        # and the two produce identically-shaped CSVs. Silently mixing them
+        # would corrupt the main result.
+        print(f"[ablation] batching capped at {args.max_tool_calls_per_exec} tool call(s) "
+              f"per execute() — code surfaces only; json_mcp is unaffected.\n"
+              f"[ablation] these results are an ABLATION ARM, not baseline numbers.\n")
 
     n_trials = max(1, args.n_trials)
     total = sum(len(modes_for(m)) for m in selected_models) * len(surfaces) * len(tasks) * n_trials
@@ -112,7 +160,9 @@ def main() -> None:
 
             consecutive_api_errors = 0
             for surface, mode, task, trial in episodes:
-                row = run_episode(model_config, surface, mode, task, trajectory_dir=str(trajectory_dir))
+                row = run_episode(model_config, surface, mode, task,
+                                   trajectory_dir=str(trajectory_dir),
+                                   max_tool_calls_per_exec=args.max_tool_calls_per_exec)
                 row["trial"] = trial
                 writer.writerow(row)
                 f.flush()

@@ -18,12 +18,33 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                              help='comma-separated: tool_call,text_block. '
                                   "Default: tool_call for models with supports_tool_calling, else text_block.")
     run_parser.add_argument("--difficulty", default=DEFAULT_DIFFICULTY, help="easy,medium,hard,expert,all")
-    run_parser.add_argument("--limit", type=int, default=None, help="max tasks per difficulty tier")
+    run_parser.add_argument("--limit", type=int, default=None,
+                             help="tasks per difficulty tier — a random but reproducible "
+                                  "sample, not the first N (see --sample-seed)")
+    run_parser.add_argument("--sample-seed", type=int, default=0,
+                             help="seed for the --limit sample (default: 0). Fixed across "
+                                  "models, surfaces and trials so every cell of the study "
+                                  "faces the same tasks; change it only to draw a different "
+                                  "(still reproducible) subset.")
     run_parser.add_argument("--n-trials", type=int, default=1,
                              help="independent episodes per (model, surface, mode, task). "
                                   "Reliability metrics (pass^k) need k<=n-trials repeats to "
                                   "estimate how consistently a cell succeeds, not just whether "
                                   "it ever does. Default 1.")
+    run_parser.add_argument("--max-tool-calls-per-exec", type=int, default=None,
+                             metavar="N",
+                             help="BATCHING ABLATION. Cap tool calls inside one "
+                                  "execute() block; further calls in the same block "
+                                  "fail with tool_call_limit_exceeded. Default: "
+                                  "uncapped. Set to 1 to forbid batching entirely, "
+                                  "forcing a code surface onto json_mcp's "
+                                  "one-call-per-turn path so that whatever advantage "
+                                  "survives is attributable to expressing the plan as "
+                                  "code rather than to batching calls together. "
+                                  "The cap is stated in the system prompt as well as "
+                                  "enforced, so the model can comply instead of "
+                                  "discovering it by failing. No effect on json_mcp, "
+                                  "which has no execute() to cap.")
     run_parser.add_argument("--models-yaml", default=DEFAULT_MODELS_YAML)
     run_parser.add_argument("--out", default=None)
 

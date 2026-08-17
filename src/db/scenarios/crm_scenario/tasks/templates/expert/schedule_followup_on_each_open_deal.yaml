@@ -28,7 +28,7 @@ params:
   rep_name: {draw: person_name}
   contact_name: {draw: person_name}
   company: {draw: company}
-  n_deals: {choice: [2, 3, 4]}
+  n_deals: {choice: [2, 4, 6, 8, 10]}
   n_clutter: {randint: [1, 2]}
   due_date: {sim_date_offset: 21}
 

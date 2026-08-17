@@ -84,16 +84,25 @@ class Episode:
     def tool_server_url(self) -> str:
         return self._tool_server_url
 
-    def exec(self, code: str, lang: str | None = None) -> dict:
+    def exec(self, code: str, lang: str | None = None,
+             max_tool_calls: int | None = None) -> dict:
+        """max_tool_calls: cap on tool calls inside this ONE block (None =
+        unlimited). Sent per request rather than set as a container env var so
+        the executor images stay identical across the batching ablation's
+        capped and uncapped arms — an image difference would be a confound."""
         if self.executor is None:
             raise RuntimeError(f"no executor container for surface={self.surface!r}")
+        payload = {"code": code, "lang": lang or self.surface}
+        # Omitted entirely when unlimited, so an uncapped run puts the exact
+        # same request on the wire as before this flag existed.
+        if max_tool_calls is not None:
+            payload["max_tool_calls"] = max_tool_calls
         last_error = None
         for attempt, delay in enumerate((0.0, *_EXEC_RETRY_DELAYS_S)):
             if delay:
                 time.sleep(delay)
             try:
-                resp = requests.post(f"{self._executor_url}/exec",
-                                      json={"code": code, "lang": lang or self.surface},
+                resp = requests.post(f"{self._executor_url}/exec", json=payload,
                                       timeout=EXEC_HTTP_TIMEOUT_S)
                 resp.raise_for_status()
                 return resp.json()

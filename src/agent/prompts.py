@@ -65,7 +65,28 @@ _LOOKUP_DISCIPLINE = (
 )
 
 
-def build_system_prompt(surface: str, interaction_mode: str, task: dict) -> str:
+def _batching_cap_line(max_tool_calls: int | None) -> str:
+    """The batching ablation's instruction to the model.
+
+    The cap has to be STATED, not merely enforced. Enforcing it silently would
+    make the ablation measure how models cope with an undocumented failure —
+    every block would run, hit the wall, and error — instead of what it is meant
+    to isolate: whether code-mode's advantage comes from batching many calls
+    into one block, or from expressing the plan as code at all. A model told the
+    rule can comply, so the capped arm differs from the uncapped arm in batching
+    only, which is the whole point of the comparison."""
+    if max_tool_calls is None:
+        return ""
+    calls = "one tool call" if max_tool_calls == 1 else f"{max_tool_calls} tool calls"
+    return (
+        f" IMPORTANT: each execute() call may make at most {calls}. A further "
+        "call in the same block fails with tool_call_limit_exceeded and is not "
+        "performed. Return the results you have and continue in the next "
+        "execute() call. You may make as many execute() calls as you need.")
+
+
+def build_system_prompt(surface: str, interaction_mode: str, task: dict,
+                        max_tool_calls_per_exec: int | None = None) -> str:
     answer_keys = ", ".join(task["answer_keys"])
 
     today_line = f"Today's date is {SIM_TODAY}."
@@ -82,6 +103,10 @@ def build_system_prompt(surface: str, interaction_mode: str, task: dict) -> str:
         )
 
     tools_doc = _TOOLS_DOC_BY_SURFACE[surface]
+    # json_mcp returns above and never sees this: it has no execute() to cap,
+    # and one call per tool call is already its native behaviour — it IS the
+    # unbatched baseline the capped code arms are being pushed toward.
+    cap_line = _batching_cap_line(max_tool_calls_per_exec)
 
     if interaction_mode == "tool_call":
         return (
@@ -91,7 +116,7 @@ def build_system_prompt(surface: str, interaction_mode: str, task: dict) -> str:
             f"lang='{surface}', never any other value. Inside your code, a `tools` "
             "object is available with one method per CRM tool. Its available "
             f"methods:\n\n{tools_doc}\n\n"
-            f"{_LOOKUP_DISCIPLINE} "
+            f"{_LOOKUP_DISCIPLINE}{cap_line} "
             "When you have the answer, call the separate final_answer tool "
             f"with these fields: {answer_keys}. final_answer is its own tool "
             "call, made the same way you call execute — it is not a method "
@@ -103,15 +128,17 @@ def build_system_prompt(surface: str, interaction_mode: str, task: dict) -> str:
         f"You solve CRM tasks by writing {surface} code in a fenced "
         f"```{surface} block. {today_line} Inside your code, a `tools` object is available "
         f"with one method per CRM tool. Its available methods:\n\n{tools_doc}\n\n"
-        f"{_LOOKUP_DISCIPLINE} "
+        f"{_LOOKUP_DISCIPLINE}{cap_line} "
         "When you have solved the task, write the marker FINAL_ANSWER followed "
         "by a ```json code block containing an object with these exact keys: "
         f"{answer_keys}."
     )
 
 
-def build_initial_messages(surface: str, interaction_mode: str, task: dict) -> list[dict]:
+def build_initial_messages(surface: str, interaction_mode: str, task: dict,
+                           max_tool_calls_per_exec: int | None = None) -> list[dict]:
     return [
-        {"role": "system", "content": build_system_prompt(surface, interaction_mode, task)},
+        {"role": "system", "content": build_system_prompt(
+            surface, interaction_mode, task, max_tool_calls_per_exec)},
         {"role": "user", "content": task["query"]},
     ]

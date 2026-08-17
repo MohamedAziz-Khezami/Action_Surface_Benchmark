@@ -4,19 +4,25 @@
     "n_qualified"
   ],
   "ground_truth": {
-    "n_qualified": 4
+    "n_qualified": 10
   },
   "expected_added": {},
   "expected_changed": {
     "leads": [
       {
-        "id": 44,
+        "id": 38,
         "fields": {
           "status": "qualified"
         }
       },
       {
-        "id": 14,
+        "id": 17,
+        "fields": {
+          "status": "qualified"
+        }
+      },
+      {
+        "id": 48,
         "fields": {
           "status": "qualified"
         }
@@ -28,7 +34,37 @@
         }
       },
       {
-        "id": 9,
+        "id": 16,
+        "fields": {
+          "status": "qualified"
+        }
+      },
+      {
+        "id": 21,
+        "fields": {
+          "status": "qualified"
+        }
+      },
+      {
+        "id": 31,
+        "fields": {
+          "status": "qualified"
+        }
+      },
+      {
+        "id": 20,
+        "fields": {
+          "status": "qualified"
+        }
+      },
+      {
+        "id": 19,
+        "fields": {
+          "status": "qualified"
+        }
+      },
+      {
+        "id": 18,
         "fields": {
           "status": "qualified"
         }
@@ -67,8 +103,8 @@
       "removed"
     ]
   },
-  "n_functions": 5,
-  "n_actions": 4,
+  "n_functions": 11,
+  "n_actions": 10,
   "task_id": "task_231",
   "world_seed": 1231,
   "difficulty": "expert",

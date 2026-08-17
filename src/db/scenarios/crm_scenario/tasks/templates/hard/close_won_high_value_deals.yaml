@@ -31,7 +31,7 @@ params:
   contact_name: {draw: person_name}
   company: {draw: company}
   threshold: {value_between: [40000, 70000]}
-  n_won: {choice: [2, 3]}       # closing AND over threshold -> set to won
+  n_won: {choice: [2, 4, 6, 8, 10]}       # closing AND over threshold -> set to won
   n_under: {choice: [1, 2]}     # closing but under threshold -> left alone
   n_clutter: {randint: [1, 2]}  # non-closing -> left alone
 

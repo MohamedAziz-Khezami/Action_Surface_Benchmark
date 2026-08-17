@@ -4,25 +4,43 @@
     "n_updated"
   ],
   "ground_truth": {
-    "n_updated": 3
+    "n_updated": 6
   },
   "expected_added": {},
   "expected_changed": {
     "leads": [
       {
-        "id": 30,
+        "id": 39,
         "fields": {
           "status": "unqualified"
         }
       },
       {
-        "id": 10,
+        "id": 25,
         "fields": {
           "status": "unqualified"
         }
       },
       {
-        "id": 7,
+        "id": 13,
+        "fields": {
+          "status": "unqualified"
+        }
+      },
+      {
+        "id": 5,
+        "fields": {
+          "status": "unqualified"
+        }
+      },
+      {
+        "id": 11,
+        "fields": {
+          "status": "unqualified"
+        }
+      },
+      {
+        "id": 16,
         "fields": {
           "status": "unqualified"
         }
@@ -61,8 +79,8 @@
       "removed"
     ]
   },
-  "n_functions": 4,
-  "n_actions": 3,
+  "n_functions": 7,
+  "n_actions": 6,
   "task_id": "task_226",
   "world_seed": 1226,
   "difficulty": "expert",

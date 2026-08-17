@@ -4,22 +4,37 @@
     "n_logged"
   ],
   "ground_truth": {
-    "n_logged": 3
+    "n_logged": 6
   },
   "expected_added": {
     "activities": [
       {
-        "deal_id": 3,
+        "deal_id": 26,
         "type": "note",
         "subject": "touch base"
       },
       {
-        "deal_id": 8,
+        "deal_id": 42,
         "type": "note",
         "subject": "touch base"
       },
       {
-        "deal_id": 39,
+        "deal_id": 38,
+        "type": "note",
+        "subject": "touch base"
+      },
+      {
+        "deal_id": 20,
+        "type": "note",
+        "subject": "touch base"
+      },
+      {
+        "deal_id": 4,
+        "type": "note",
+        "subject": "touch base"
+      },
+      {
+        "deal_id": 18,
         "type": "note",
         "subject": "touch base"
       }
@@ -27,7 +42,7 @@
   },
   "expected_changed": {},
   "exact_added_count": {
-    "activities": 3
+    "activities": 6
   },
   "forbidden": {
     "reps": [
@@ -60,8 +75,8 @@
       "removed"
     ]
   },
-  "n_functions": 4,
-  "n_actions": 3,
+  "n_functions": 7,
+  "n_actions": 6,
   "task_id": "task_121",
   "world_seed": 1121,
   "difficulty": "hard",

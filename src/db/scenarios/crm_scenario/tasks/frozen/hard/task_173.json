@@ -4,7 +4,7 @@
     "n_won"
   ],
   "ground_truth": {
-    "n_won": 2
+    "n_won": 10
   },
   "expected_added": {},
   "expected_changed": {
@@ -16,7 +16,55 @@
         }
       },
       {
-        "id": 6,
+        "id": 18,
+        "fields": {
+          "stage": "won"
+        }
+      },
+      {
+        "id": 35,
+        "fields": {
+          "stage": "won"
+        }
+      },
+      {
+        "id": 48,
+        "fields": {
+          "stage": "won"
+        }
+      },
+      {
+        "id": 16,
+        "fields": {
+          "stage": "won"
+        }
+      },
+      {
+        "id": 38,
+        "fields": {
+          "stage": "won"
+        }
+      },
+      {
+        "id": 37,
+        "fields": {
+          "stage": "won"
+        }
+      },
+      {
+        "id": 13,
+        "fields": {
+          "stage": "won"
+        }
+      },
+      {
+        "id": 11,
+        "fields": {
+          "stage": "won"
+        }
+      },
+      {
+        "id": 20,
         "fields": {
           "stage": "won"
         }
@@ -55,8 +103,8 @@
       "removed"
     ]
   },
-  "n_functions": 3,
-  "n_actions": 2,
+  "n_functions": 11,
+  "n_actions": 10,
   "task_id": "task_173",
   "world_seed": 1173,
   "difficulty": "hard",

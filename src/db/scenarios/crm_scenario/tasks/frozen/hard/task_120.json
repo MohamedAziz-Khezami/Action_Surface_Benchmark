@@ -1,38 +1,48 @@
 {
-  "query": "Log a note with the subject 'touch base' on every open deal owned by Dana Mo. Report how many you logged as n_logged.",
+  "query": "Log a note with the subject 'quarterly review' on every open deal owned by Dana Mo. Report how many you logged as n_logged.",
   "answer_keys": [
     "n_logged"
   ],
   "ground_truth": {
-    "n_logged": 4
+    "n_logged": 6
   },
   "expected_added": {
     "activities": [
       {
-        "deal_id": 5,
+        "deal_id": 29,
         "type": "note",
-        "subject": "touch base"
+        "subject": "quarterly review"
       },
       {
-        "deal_id": 1,
+        "deal_id": 31,
         "type": "note",
-        "subject": "touch base"
+        "subject": "quarterly review"
       },
       {
-        "deal_id": 34,
+        "deal_id": 21,
         "type": "note",
-        "subject": "touch base"
+        "subject": "quarterly review"
       },
       {
-        "deal_id": 8,
+        "deal_id": 4,
         "type": "note",
-        "subject": "touch base"
+        "subject": "quarterly review"
+      },
+      {
+        "deal_id": 19,
+        "type": "note",
+        "subject": "quarterly review"
+      },
+      {
+        "deal_id": 9,
+        "type": "note",
+        "subject": "quarterly review"
       }
     ]
   },
   "expected_changed": {},
   "exact_added_count": {
-    "activities": 4
+    "activities": 6
   },
   "forbidden": {
     "reps": [
@@ -65,8 +75,8 @@
       "removed"
     ]
   },
-  "n_functions": 5,
-  "n_actions": 4,
+  "n_functions": 7,
+  "n_actions": 6,
   "task_id": "task_120",
   "world_seed": 1120,
   "difficulty": "hard",

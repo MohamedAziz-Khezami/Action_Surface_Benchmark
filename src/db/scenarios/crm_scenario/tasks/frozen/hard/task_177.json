@@ -4,22 +4,37 @@
     "n_logged"
   ],
   "ground_truth": {
-    "n_logged": 3
+    "n_logged": 6
   },
   "expected_added": {
     "activities": [
       {
-        "deal_id": 4,
+        "deal_id": 43,
         "type": "note",
         "subject": "status update"
       },
       {
-        "deal_id": 14,
+        "deal_id": 7,
         "type": "note",
         "subject": "status update"
       },
       {
-        "deal_id": 18,
+        "deal_id": 22,
+        "type": "note",
+        "subject": "status update"
+      },
+      {
+        "deal_id": 37,
+        "type": "note",
+        "subject": "status update"
+      },
+      {
+        "deal_id": 40,
+        "type": "note",
+        "subject": "status update"
+      },
+      {
+        "deal_id": 38,
         "type": "note",
         "subject": "status update"
       }
@@ -27,7 +42,7 @@
   },
   "expected_changed": {},
   "exact_added_count": {
-    "activities": 3
+    "activities": 6
   },
   "forbidden": {
     "reps": [
@@ -60,8 +75,8 @@
       "removed"
     ]
   },
-  "n_functions": 4,
-  "n_actions": 3,
+  "n_functions": 7,
+  "n_actions": 6,
   "task_id": "task_177",
   "world_seed": 1177,
   "difficulty": "hard",

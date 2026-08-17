@@ -14,9 +14,17 @@ _TRANSPORT_ERROR_NAMES = {"HTTPError", "ConnectionError", "Timeout"}
 
 
 def _categorize_error(error: dict) -> str:
-    """Returns one of 'syntax', 'type', 'tool', 'runtime'."""
+    """Returns one of 'cap', 'syntax', 'type', 'tool', 'runtime'."""
     code = error.get("code")
     name = error.get("name")
+    # Checked first, and kept out of every error bucket: a cap hit is the
+    # batching ablation working as designed, not a defect in the model's code.
+    # Counting it as a runtime error would make the capped arm look like it
+    # degraded code quality when all it did was enforce its own constraint,
+    # and would inflate `recovered` for every episode that simply continued
+    # in the next block.
+    if code == "tool_call_limit_exceeded":
+        return "cap"
     if code == "ts_syntax_error":
         return "syntax"
     if code == "ts_type_error":
@@ -34,11 +42,21 @@ class EpisodeMeter:
     def __init__(self, episode_id: str, model: str, surface: str, interaction_mode: str,
                  task_id: str, difficulty: str, world_seed: int, n_functions_expected: int,
                  template: str, pattern: str,
+                 max_tool_calls_per_exec: int | None = None,
+                 turn_budget: int | None = None,
                  price_in_per_mtok: float | None = None,
                  price_out_per_mtok: float | None = None,
                  sandbox_usd_per_second: float = 0.0):
         self.episode_id = episode_id
         self.model = model
+        # Recorded per episode so a capped run is identifiable from the CSV
+        # alone. Without it, the ablation's two arms are indistinguishable in
+        # the results and could only be told apart by which file they landed in.
+        self.max_tool_calls_per_exec = max_tool_calls_per_exec
+        # The budget this episode actually got. It varies per task now, so
+        # hit_turn_budget is uninterpretable without it — 20 turns used means
+        # something very different under a budget of 20 than under 60.
+        self.turn_budget = turn_budget
         # Prices are captured per episode so the cost is reproducible from the
         # CSV even if models.yaml or config.py later change.
         self.price_in_per_mtok = price_in_per_mtok
@@ -64,6 +82,10 @@ class EpisodeMeter:
         self.execution_latency_seconds = 0.0
 
         self.tool_error_count = 0
+        # Times an execute() block was stopped by max_tool_calls_per_exec.
+        # 0 for every uncapped episode, so it is also a check that the cap
+        # actually bit rather than being silently unreachable.
+        self.exec_cap_hit_count = 0
         self.syntax_error_count = 0
         self.type_error_count = 0
         self.runtime_error_count = 0
@@ -90,7 +112,9 @@ class EpisodeMeter:
         error = exec_result.get("error")
         if error:
             bucket = _categorize_error(error)
-            if bucket == "syntax":
+            if bucket == "cap":
+                self.exec_cap_hit_count += 1
+            elif bucket == "syntax":
                 self.syntax_error_count += 1
             elif bucket == "type":
                 self.type_error_count += 1
@@ -180,6 +204,8 @@ class EpisodeMeter:
             "answer_correct": answer_correct,
             "db_correct": db_correct,
             "fulfillment_score": fulfillment_score,
+            "max_tool_calls_per_exec": self.max_tool_calls_per_exec,
+            "turn_budget": self.turn_budget,
             "n_functions_expected": self.n_functions_expected,
             "tool_calls_made": self.tool_calls_made,
             "model_turns": self.model_turns,
@@ -200,6 +226,7 @@ class EpisodeMeter:
             "type_error_count": self.type_error_count,
             "runtime_error_count": self.runtime_error_count,
             "parse_error_count": self.parse_error_count,
+            "exec_cap_hit_count": self.exec_cap_hit_count,
             "recovered": recovered,
             "unauthorized_write_count": unauthorized_write_count,
             "had_unauthorized_write": int(unauthorized_write_count > 0),
