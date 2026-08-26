@@ -23,6 +23,7 @@ CSV_FIELDS = [
     "tool_error_count", "syntax_error_count", "type_error_count", "runtime_error_count", "parse_error_count", "exec_cap_hit_count",
     "recovered", "unauthorized_write_count", "had_unauthorized_write",
     "hit_turn_budget", "infra_error", "model_api_error", "model_api_error_message",
+    "malformed_action", "malformed_action_message",
     "episode_error", "episode_error_message",
     "verifier_reasons",
 ]

@@ -28,7 +28,7 @@ from src.agent.trajectory import Trajectory
 from src.db import db as db_mod
 from src.db.scenarios.crm_scenario import crm_db
 from src.docker_runner.episode import Episode
-from src.llm_clients.client import make_client
+from src.llm_clients.client import MalformedActionError, make_client
 from src.meter.meter import EpisodeMeter
 from src.verifier.verify import verify
 
@@ -174,6 +174,16 @@ def run_episode(model_config, surface: str, interaction_mode: str, task: dict,
             t0 = time.monotonic()
             try:
                 resp = client.complete(messages, tools=tools_param)  # Model call
+            except MalformedActionError as e:
+                # The server answered; the MODEL produced something unusable.
+                # Break rather than return: the episode falls through to the
+                # normal state-diff + verify below, so it is scored on the
+                # state it actually reached and stays in the denominator.
+                # Returning early (as the api-error path does) would discard
+                # it, which would delete json_mcp's characteristic failure
+                # mode from the results — see MalformedActionError's docstring.
+                meter.mark_malformed_action(str(e))
+                break
             except Exception as e:  # noqa: BLE001 — providers raise many different
                 # exception types for this (context-length exceeded, rate limits,
                 # malformed requests, outages...); catching broadly and recording

@@ -13,6 +13,43 @@ from src.llm_clients.registry import ModelConfig
 
 
 
+class MalformedActionError(RuntimeError):
+    """The model emitted output that could not be turned into a usable action.
+
+    Deliberately NOT a model_api_error. A transport failure means the server
+    stopped serving and every further episode buys another timeout, which is
+    what main.py's circuit breaker exists to stop. This is the opposite: the
+    server is healthy and answered promptly — the MODEL produced tool-call
+    syntax the server could not parse, or arguments that are not valid JSON.
+
+    That is a failure at the task, and it must stay in the denominator.
+    Discarding it would delete a real, surface-dependent failure mode from
+    the results: json_mcp emits one structured call per action, 2-12 per
+    episode, across 17 tools with different argument shapes, while a code
+    surface emits 1-3 execute() wrappers of one fixed two-field shape. So
+    json_mcp is far more exposed to this, and excluding these episodes would
+    quietly compute its pass rate only over the episodes where it happened to
+    stay grammatical."""
+
+
+# Substrings that identify a 5xx as "the server could not parse the MODEL's
+# output" rather than "the server is broken". Matched case-insensitively and
+# only on a 5xx, so a genuine outage is never swallowed as a model failure.
+_MALFORMED_OUTPUT_MARKERS = (
+    "does not match the expected",   # llama.cpp: "...expected peg-native format"
+    "peg-native",
+    "failed to parse",
+)
+
+
+def _is_malformed_output(exc: Exception) -> bool:
+    status = getattr(exc, "status_code", None)
+    if status is None or status < 500:
+        return False
+    text = str(exc).lower()
+    return any(marker in text for marker in _MALFORMED_OUTPUT_MARKERS)
+
+
 @dataclass
 class ModelResponse:
     content: str
@@ -37,13 +74,26 @@ class OpenAICompatibleClient:
         kwargs = {"model": self._model_id, "messages": messages}
         if tools:
             kwargs["tools"] = tools
-        resp = self._client.chat.completions.create(**kwargs)
+        try:
+            resp = self._client.chat.completions.create(**kwargs)
+        except openai.APIStatusError as e:
+            if _is_malformed_output(e):
+                raise MalformedActionError(str(e)) from e
+            raise
         message = resp.choices[0].message
 
         tool_calls = []
         for tc in (message.tool_calls or []):
+            # Arguments arrive as a JSON *string* the model generated. When it
+            # is malformed the server still returns 200, so this is the same
+            # class of failure as the 5xx above — the model, not the transport.
+            try:
+                arguments = json.loads(tc.function.arguments)
+            except (json.JSONDecodeError, TypeError) as e:
+                raise MalformedActionError(
+                    f"tool call {tc.function.name!r} had unparseable arguments: {e}") from e
             tool_calls.append({"id": tc.id, "name": tc.function.name,
-                                "arguments": json.loads(tc.function.arguments)})
+                                "arguments": arguments})
 
         return ModelResponse(
             content=message.content or "",

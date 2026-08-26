@@ -95,6 +95,12 @@ class EpisodeMeter:
         self.infra_error = 0
         self.model_api_error = 0
         self.model_api_error_message = ""
+        # The model emitted an unusable action (ungrammatical tool call, or
+        # arguments that are not valid JSON). A FAILED episode, not an
+        # infrastructure fault — it keeps its row, gets verified against
+        # whatever state it reached, and never trips the circuit breaker.
+        self.malformed_action = 0
+        self.malformed_action_message = ""
         self.episode_error = 0
         self.episode_error_message = ""
 
@@ -140,6 +146,14 @@ class EpisodeMeter:
         NOTHING inside run_episode() can crash the batch run in main.py."""
         self.episode_error = 1
         self.episode_error_message = message
+
+    def mark_malformed_action(self, message: str) -> None:
+        """Distinct from mark_model_api_error: the server answered, the model
+        failed. Recorded per episode so the rate is comparable across surfaces
+        — it is expected to be higher for json_mcp, which emits several varied
+        structured calls per episode rather than a few fixed execute() ones."""
+        self.malformed_action = 1
+        self.malformed_action_message = message[:500]
 
     def mark_model_api_error(self, message: str) -> None:
         """The call to the model itself failed (context-length exceeded,
@@ -234,6 +248,8 @@ class EpisodeMeter:
             "infra_error": self.infra_error,
             "model_api_error": self.model_api_error,
             "model_api_error_message": self.model_api_error_message,
+            "malformed_action": self.malformed_action,
+            "malformed_action_message": self.malformed_action_message,
             "episode_error": self.episode_error,
             "episode_error_message": self.episode_error_message,
             "verifier_reasons": "; ".join(verify_result["reasons"]),
